@@ -86,17 +86,37 @@ body {
     height: 24px;
 }
 
-/* КНОПКА МУЗЫКИ */
-.music-btn {
+/* МУЗЫКАЛЬНАЯ ПАНЕЛЬ */
+.music-panel {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(0,0,0,0.6);
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px);
+    padding: 10px 20px;
+    border-radius: 20px;
+
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 0 15px rgba(123,47,247,0.6);
+}
+
+.music-btn {
+    background: none;
     border: none;
     color: white;
-    padding: 12px;
-    border-radius: 12px;
+    font-size: 22px;
     cursor: pointer;
+}
+
+.volume {
+    width: 120px;
+    accent-color: #7b2ff7;
 }
 </style>
 
@@ -111,7 +131,7 @@ body {
     <!-- АВАТАР -->
     <img src="photo.jpg" class="avatar">
 
-    <!-- КНОПКИ С ИКОНКАМИ -->
+    <!-- КНОПКИ -->
     <a class="btn" href="https://twitch.tv/ay3ent" target="_blank">
         <img src="twitch.png" class="icon">
         Twitch
@@ -129,21 +149,35 @@ body {
     <source src="music.mp3" type="audio/mpeg">
 </audio>
 
-<button class="music-btn" onclick="toggleMusic()">🔊</button>
+<!-- ПАНЕЛЬ -->
+<div class="music-panel">
+    <button class="music-btn" onclick="toggleMusic()" id="musicBtn">🔊</button>
+    <input type="range" min="0" max="1" step="0.01" value="0.5" class="volume" id="volumeControl">
+</div>
 
 <script>
 let music = document.getElementById("music");
+let btn = document.getElementById("musicBtn");
+let volume = document.getElementById("volumeControl");
+
+music.volume = 0.5;
 let isPlaying = false;
 
 function toggleMusic() {
     if (isPlaying) {
         music.pause();
+        btn.innerText = "🔇";
         isPlaying = false;
     } else {
         music.play();
+        btn.innerText = "🔊";
         isPlaying = true;
     }
 }
+
+volume.addEventListener("input", function() {
+    music.volume = this.value;
+});
 </script>
 
 </body>
