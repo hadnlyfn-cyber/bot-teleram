@@ -4,3 +4,14 @@
     vertical-align: middle;
     margin-right: 10px;
 }
+.btn-img {
+    width: 260px;
+    margin: 10px;
+    transition: 0.3s;
+    display: block;
+}
+
+.btn-img:hover {
+    transform: scale(1.07);
+    filter: drop-shadow(0 0 15px #7b2ff7);
+}
