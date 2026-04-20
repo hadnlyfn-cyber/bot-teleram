@@ -5,13 +5,19 @@
     margin-right: 10px;
 }
 .btn-img {
-    width: 260px;
-    margin: 10px;
-    transition: 0.3s;
+    width: 220px; /* меньше */
+    height: auto;
+    margin: 8px;
     display: block;
+
+    border-radius: 25px; /* сильнее закругление */
+
+    transition: all 0.25s ease;
+}
 }
 
 .btn-img:hover {
-    transform: scale(1.07);
-    filter: drop-shadow(0 0 15px #7b2ff7);
+    transform: scale(1.05);
+
+    filter: drop-shadow(0 0 10px rgba(123,47,247,0.6));
 }
