@@ -57,20 +57,19 @@ body {
 .buttons {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 18px;
 }
 
-/* СТРОКА */
 .btn-row {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
 }
 
-/* PNG КНОПКА */
+/* МЕНЬШИЕ PNG КНОПКИ */
 .btn-img {
-    width: 140px;
-    border-radius: 25px;
+    width: 110px; /* уменьшили */
+    border-radius: 20px;
     transition: 0.3s;
 }
 
@@ -82,17 +81,33 @@ body {
 /* ТЕКСТ */
 .btn-text {
     color: white;
-    font-size: 16px;
+    font-size: 14px;
     opacity: 0;
     transform: translateX(-20px);
     transition: 0.4s;
     text-shadow: 0 0 10px #7b2ff7, 0 0 20px #7b2ff7;
 }
 
-/* ПОЯВЛЕНИЕ ТЕКСТА */
 .btn-row:hover .btn-text {
     opacity: 1;
     transform: translateX(0);
+}
+
+/* ВИЗУАЛИЗАТОР */
+.visualizer {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+}
+
+.bar {
+    width: 5px;
+    height: 20px;
+    background: #7b2ff7;
+    box-shadow: 0 0 10px #7b2ff7;
 }
 
 /* МУЗЫКА */
@@ -137,15 +152,13 @@ body {
 
 <div class="container">
 
-    <!-- АВАТАР -->
     <img src="photo.jpg" class="avatar">
 
-    <!-- КНОПКИ -->
     <div class="buttons">
 
         <div class="btn-row">
             <a href="https://twitch.tv/ay3ent" target="_blank">
-                <img src="twitch.png" class="btn-img">
+                <img src="twitch2.png" class="btn-img">
             </a>
             <span class="btn-text">twitch</span>
         </div>
@@ -161,6 +174,9 @@ body {
 
 </div>
 
+<!-- ВИЗУАЛИЗАТОР -->
+<div class="visualizer" id="visualizer"></div>
+
 <!-- МУЗЫКА -->
 <audio id="music" loop>
     <source src="music.mp3" type="audio/mpeg">
@@ -175,18 +191,39 @@ body {
 let music = document.getElementById("music");
 let btn = document.getElementById("musicBtn");
 let volume = document.getElementById("volumeControl");
+let visualizer = document.getElementById("visualizer");
 
 music.volume = 0.5;
 let isPlaying = false;
+
+// полоски
+for (let i = 0; i < 30; i++) {
+    let bar = document.createElement("div");
+    bar.classList.add("bar");
+    visualizer.appendChild(bar);
+}
+
+let bars = document.querySelectorAll(".bar");
+
+function animateBars() {
+    bars.forEach(bar => {
+        let height = Math.random() * 50 + 10;
+        bar.style.height = height + "px";
+    });
+}
+
+let interval;
 
 function toggleMusic() {
     if (isPlaying) {
         music.pause();
         btn.innerText = "🔇";
+        clearInterval(interval);
         isPlaying = false;
     } else {
         music.play();
         btn.innerText = "🔊";
+        interval = setInterval(animateBars, 100);
         isPlaying = true;
     }
 }
