@@ -1,23 +1,31 @@
-.icon {
-    width: 24px;
-    height: 24px;
-    vertical-align: middle;
-    margin-right: 10px;
+.buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
+
+/* строка кнопки */
+.btn-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* PNG кнопка */
 .btn-img {
-    width: 160px; /* было 220 → стало меньше */
-    height: auto;
+    width: 140px;
     border-radius: 25px;
-    transition: all 0.25s ease;
+    transition: 0.25s;
 }
 
 .btn-img:hover {
     transform: scale(1.05);
     filter: drop-shadow(0 0 10px rgba(123,47,247,0.6));
 }
-.buttons {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    align-items: center;
+
+/* текст */
+.btn-text {
+    color: white;
+    font-size: 16px;
+    opacity: 0.8;
 }
