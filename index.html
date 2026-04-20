@@ -48,30 +48,51 @@ body {
     height: 170px;
     border-radius: 50%;
     object-fit: cover;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
     transform: translateY(-40px);
     box-shadow: 0 0 20px #7b2ff7, 0 0 40px #7b2ff7;
 }
 
-/* КНОПКИ В РЯД */
+/* КНОПКИ */
 .buttons {
     display: flex;
-    gap: 15px;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    gap: 20px;
 }
 
-/* PNG КНОПКИ */
+/* СТРОКА */
+.btn-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* PNG КНОПКА */
 .btn-img {
-    width: 150px;
-    height: auto;
+    width: 140px;
     border-radius: 25px;
-    transition: all 0.25s ease;
+    transition: 0.3s;
 }
 
 .btn-img:hover {
-    transform: scale(1.05);
-    filter: drop-shadow(0 0 10px rgba(123,47,247,0.6));
+    transform: scale(1.07);
+    filter: drop-shadow(0 0 12px rgba(123,47,247,0.8));
+}
+
+/* ТЕКСТ */
+.btn-text {
+    color: white;
+    font-size: 16px;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: 0.4s;
+    text-shadow: 0 0 10px #7b2ff7, 0 0 20px #7b2ff7;
+}
+
+/* ПОЯВЛЕНИЕ ТЕКСТА */
+.btn-row:hover .btn-text {
+    opacity: 1;
+    transform: translateX(0);
 }
 
 /* МУЗЫКА */
@@ -121,13 +142,21 @@ body {
 
     <!-- КНОПКИ -->
     <div class="buttons">
-        <a href="https://twitch.tv/ay3ent" target="_blank">
-            <img src="twitch2.png" class="btn-img">
-        </a>
 
-        <a href="https://t.me/ay3ent" target="_blank">
-            <img src="telegram.png" class="btn-img">
-        </a>
+        <div class="btn-row">
+            <a href="https://twitch.tv/ay3ent" target="_blank">
+                <img src="twitch.png" class="btn-img">
+            </a>
+            <span class="btn-text">twitch</span>
+        </div>
+
+        <div class="btn-row">
+            <a href="https://t.me/ay3ent" target="_blank">
+                <img src="telegram.png" class="btn-img">
+            </a>
+            <span class="btn-text">telegram</span>
+        </div>
+
     </div>
 
 </div>
