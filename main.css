@@ -123,3 +123,55 @@ align-items: center;
 justify-content: center;
 text-decoration: none;
 }
+/* 📱 MOBILE ADAPT */
+@media (max-width: 768px){
+
+body{
+cursor:auto; /* убираем кастом курсор */
+}
+
+/* скрываем курсор */
+.cursor,
+.cursor-follower{
+display:none;
+}
+
+.wrapper{
+width:95vw;
+height:90vh;
+border-radius:20px;
+padding:20px;
+}
+
+/* аватар меньше */
+.avatar-wrap{
+width:120px;
+height:120px;
+}
+
+/* кнопки удобнее */
+.btn img{
+width:45px;
+}
+
+.buttons{
+gap:12px;
+}
+
+/* плеер */
+.player{
+width:90%;
+bottom:10px;
+}
+
+.play-btn{
+width:55px;
+height:55px;
+}
+
+/* текст */
+.typing{
+font-size:13px;
+}
+
+}
