@@ -20,10 +20,10 @@ cursor:none;
 position:fixed;
 width:10px;
 height:10px;
-border-radius:50%;
 background:white;
-pointer-events:none;
+border-radius:50%;
 z-index:9999;
+pointer-events:none;
 transform:translate(-50%,-50%);
 }
 
@@ -33,10 +33,10 @@ width:40px;
 height:40px;
 border-radius:50%;
 background:rgba(123,47,247,0.25);
-pointer-events:none;
+filter:blur(12px);
 z-index:9998;
+pointer-events:none;
 transform:translate(-50%,-50%);
-filter:blur(10px);
 }
 
 /* INTRO */
@@ -62,7 +62,7 @@ background:url('bg.gif') center/cover no-repeat;
 z-index:-2;
 }
 
-/* GLASS */
+/* WRAPPER */
 .wrapper{
 position:absolute;
 top:50%;
@@ -100,23 +100,11 @@ width:100%;
 height:100%;
 border-radius:50%;
 z-index:2;
-position:relative;
 }
 #circleVis{
 position:absolute;
-top:0;
-left:0;
 width:100%;
 height:100%;
-}
-
-/* BOTTOM VIS */
-#audioVis{
-position:absolute;
-bottom:0;
-left:0;
-width:100%;
-height:60px;
 }
 
 /* BUTTONS */
@@ -132,18 +120,12 @@ align-items:center;
 gap:10px;
 }
 .btn{
-display:inline-flex;
 padding:10px;
 border-radius:16px;
 background:rgba(255,255,255,0.06);
-backdrop-filter:blur(10px);
 transition:0.25s;
-text-decoration:none;
 }
-.btn img{
-width:50px;
-border-radius:10px;
-}
+.btn img{width:50px;border-radius:10px;}
 .btn-text{
 color:white;
 opacity:0;
@@ -155,7 +137,7 @@ opacity:1;
 transform:translateX(0);
 }
 .btn:hover{
-transform:scale(1.07);
+transform:scale(1.08);
 box-shadow:0 0 20px #7b2ff7;
 }
 
@@ -165,16 +147,38 @@ position:absolute;
 bottom:80px;
 width:80%;
 }
+
 .play-btn{
 width:60px;
 height:60px;
 border-radius:50%;
-border:none;
 background:#7b2ff7;
+border:none;
 color:white;
-font-size:20px;
+cursor:pointer;
 display:block;
 margin:auto;
+box-shadow:0 0 20px #7b2ff7;
+}
+
+/* VOLUME */
+.volume{
+width:100%;
+margin-top:10px;
+}
+.volume input{
+width:100%;
+appearance:none;
+height:4px;
+background:rgba(255,255,255,0.2);
+outline:none;
+}
+.volume input::-webkit-slider-thumb{
+appearance:none;
+width:12px;
+height:12px;
+background:#7b2ff7;
+border-radius:50%;
 cursor:pointer;
 }
 
@@ -198,6 +202,14 @@ display:flex;
 justify-content:space-between;
 font-size:11px;
 color:#aaa;
+}
+
+/* VIS */
+#audioVis{
+position:absolute;
+bottom:0;
+width:100%;
+height:60px;
 }
 </style>
 </head>
@@ -223,7 +235,6 @@ color:#aaa;
 </div>
 
 <div class="buttons">
-
 <div class="btn-row">
 <a href="https://twitch.tv/ay3ent" target="_blank" class="btn">
 <img src="twitch2.png">
@@ -237,7 +248,6 @@ color:#aaa;
 </a>
 <span class="btn-text">telegram</span>
 </div>
-
 </div>
 
 <div class="player">
@@ -251,6 +261,11 @@ color:#aaa;
 <span id="current">0:00</span>
 <span id="duration">0:00</span>
 </div>
+
+<div class="volume">
+<input type="range" id="volume" min="0" max="1" step="0.01">
+</div>
+
 </div>
 
 <canvas id="audioVis"></canvas>
@@ -264,8 +279,8 @@ const music = document.getElementById("music");
 const playBtn = document.getElementById("playBtn");
 
 /* CURSOR */
-const cur=document.getElementById("cursor");
-const glow=document.getElementById("cursorGlow");
+const cur = document.getElementById("cursor");
+const glow = document.getElementById("cursorGlow");
 
 let x=0,y=0,fx=0,fy=0;
 
@@ -284,14 +299,13 @@ requestAnimationFrame(loop);
 })();
 
 /* TYPING */
-const typing=document.getElementById("typing");
 let words=["ay3ent","streamer","developer"];
 let i=0,j=0;
 (function t(){
 typing.innerHTML=words[i].slice(0,j)+"|";
 j++;
 if(j>words[i].length+3){j=0;i=(i+1)%words.length;}
-setTimeout(t,120);
+setTimeout(t,100);
 })();
 
 /* AUDIO */
@@ -304,10 +318,19 @@ analyser.fftSize=128;
 
 const data=new Uint8Array(analyser.frequencyBinCount);
 
-/* VIS */
+/* VOLUME */
+const volume = document.getElementById("volume");
+volume.value = localStorage.getItem("vol") || 0.5;
+music.volume = volume.value;
+
+volume.oninput = ()=>{
+music.volume = volume.value;
+localStorage.setItem("vol", volume.value);
+};
+
+/* VISUALIZER */
 const c1=document.getElementById("audioVis");
 const ctx1=c1.getContext("2d");
-
 const c2=document.getElementById("circleVis");
 const ctx2=c2.getContext("2d");
 
@@ -324,7 +347,6 @@ function draw(){
 requestAnimationFrame(draw);
 analyser.getByteFrequencyData(data);
 
-/* bottom bars */
 ctx1.clearRect(0,0,c1.width,c1.height);
 let w=c1.width/data.length;
 for(let i=0;i<data.length;i++){
@@ -333,7 +355,6 @@ ctx1.fillStyle="#7b2ff7";
 ctx1.fillRect(i*w,c1.height-h,w-2,h);
 }
 
-/* circle */
 ctx2.clearRect(0,0,c2.width,c2.height);
 let cx=c2.width/2;
 let cy=c2.height/2;
