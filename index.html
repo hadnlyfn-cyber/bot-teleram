@@ -78,7 +78,7 @@ flex-direction:column;
 align-items:center;
 justify-content:center;
 opacity:0;
-transition:1.5s;
+transition:1s ease-out;
 }
 
 /* TEXT */
@@ -90,7 +90,7 @@ position:relative;
 width:150px;
 height:150px;
 transform: translateY(100px); /* выдвигаем аватарку вниз */
-transition: transform 1s ease-out;
+transition: transform 0.5s ease-out;
 }
 .avatar{width:100%;height:100%;border-radius:50%;}
 #circleVis{position:absolute;width:100%;height:100%;}
@@ -102,7 +102,7 @@ display:flex;
 flex-direction:column;
 gap:15px;
 transform: translateY(100px); /* выдвигаем кнопки вниз */
-transition: transform 1s ease-out;
+transition: transform 0.5s ease-out;
 }
 .btn-row{display:flex;align-items:center;gap:10px;}
 .btn{padding:10px;border-radius:16px;background:rgba(255,255,255,0.06);transition:0.25s;}
@@ -408,13 +408,11 @@ current.innerText=format(music.currentTime);
 intro.onclick=()=>{
 intro.style.opacity=0;
 main.style.opacity=1;
-setTimeout(()=>{
-intro.remove();
-
 document.querySelectorAll('.avatar-wrap,.buttons').forEach(el => {
 el.style.transform = "translateY(0)";
 });
-},1000);
+
+setTimeout(()=>intro.remove(),0);
 
 music.play();
 audioCtx.resume();
