@@ -34,7 +34,7 @@ body {
     transition: 1.5s;
 }
 
-/* PARALLAX BG */
+/* PARALLAX */
 .background {
     position: fixed;
     width: 120%;
@@ -59,23 +59,34 @@ canvas {
     justify-content: center;
 }
 
-/* AVATAR */
+/* AVATAR + GLOW */
+.avatar-wrap {
+    position: relative;
+}
+
+.avatar-glow {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(123,47,247,0.4), transparent);
+    filter: blur(40px);
+    z-index: -1;
+    transform: translate(-30px,-30px);
+}
+
 .avatar {
     width: 140px;
     height: 140px;
     border-radius: 50%;
     object-fit: cover;
     box-shadow: 0 0 30px #7b2ff7;
-    transition: 0.3s;
-}
-.avatar:hover {
-    transform: scale(1.05);
 }
 
 /* VIEWS */
 .views {
     color: #aaa;
     margin: 10px;
+    transition: 0.3s;
 }
 
 /* TEXT */
@@ -102,6 +113,8 @@ canvas {
     gap: 10px;
     transition: 0.25s;
     transform-style: preserve-3d;
+    position: relative;
+    overflow: hidden;
 }
 
 .btn img {
@@ -112,6 +125,19 @@ canvas {
 .btn:hover {
     transform: translateY(-4px) scale(1.05);
     box-shadow: 0 0 25px rgba(123,47,247,0.6);
+}
+
+/* ripple */
+.btn::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* PLAYER */
@@ -126,12 +152,6 @@ canvas {
 canvas#visualizer {
     width: 100%;
     height: 60px;
-}
-
-/* TIME */
-.time {
-    color: #aaa;
-    font-size: 10px;
 }
 </style>
 </head>
@@ -149,7 +169,10 @@ canvas#visualizer {
 
 <div class="container">
 
+<div class="avatar-wrap">
+<div class="avatar-glow" id="glow"></div>
 <img src="photo.jpg" class="avatar">
+</div>
 
 <div class="views" id="views">👁 0</div>
 
@@ -181,13 +204,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB5YVBwTUnlCLzrZgxuoNhbkdEMDReOJKo",
+  apiKey: "AIza...",
   authDomain: "boty-b7a7f.firebaseapp.com",
   databaseURL: "https://boty-b7a7f-default-rtdb.firebaseio.com/",
   projectId: "boty-b7a7f",
   storageBucket: "boty-b7a7f.firebasestorage.app",
   messagingSenderId: "1011485229092",
-  appId: "1:1011485229092:web:1d3e8c272845b36dcc18b1"
+  appId: "1:1011485229092:web:..."
 };
 
 const app = initializeApp(firebaseConfig);
@@ -205,7 +228,7 @@ document.getElementById("views").innerText="👁 "+s.val();
 </script>
 
 <script>
-let music = document.getElementById("music");
+let music=document.getElementById("music");
 
 /* ENTER */
 function enterSite(){
@@ -216,11 +239,13 @@ music.play();
 initAudio();
 }
 
-/* PARALLAX */
+/* PARALLAX + GLOW */
 document.addEventListener("mousemove", e=>{
 let x=(e.clientX/window.innerWidth-0.5)*20;
 let y=(e.clientY/window.innerHeight-0.5)*20;
 document.getElementById("bg").style.transform=`translate(${x}px,${y}px)`;
+
+document.getElementById("glow").style.transform=`translate(${x*2}px,${y*2}px)`;
 });
 
 /* PARTICLES */
@@ -230,8 +255,8 @@ canvas.width=innerWidth;
 canvas.height=innerHeight;
 
 let p=[];
-for(let i=0;i<40;i++){
-p.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3});
+for(let i=0;i<50;i++){
+p.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-0.5)*0.2,vy:(Math.random()-0.5)*0.2});
 }
 
 function draw(){
@@ -239,8 +264,8 @@ ctx.clearRect(0,0,canvas.width,canvas.height);
 p.forEach(a=>{
 a.x+=a.vx;a.y+=a.vy;
 ctx.beginPath();
-ctx.arc(a.x,a.y,1.2,0,Math.PI*2);
-ctx.fillStyle="rgba(123,47,247,0.4)";
+ctx.arc(a.x,a.y,1,0,Math.PI*2);
+ctx.fillStyle="rgba(123,47,247,0.3)";
 ctx.fill();
 });
 requestAnimationFrame(draw);
@@ -249,32 +274,29 @@ draw();
 
 /* VISUALIZER */
 function initAudio(){
-const ctxAudio=new AudioContext();
-const src=ctxAudio.createMediaElementSource(music);
-const analyser=ctxAudio.createAnalyser();
+const ctxA=new AudioContext();
+const src=ctxA.createMediaElementSource(music);
+const analyser=ctxA.createAnalyser();
 
 src.connect(analyser);
-analyser.connect(ctxAudio.destination);
+analyser.connect(ctxA.destination);
 
-analyser.fftSize=64;
-const bufferLength=analyser.frequencyBinCount;
-const dataArray=new Uint8Array(bufferLength);
+analyser.fftSize=128;
+let data=new Uint8Array(analyser.frequencyBinCount);
 
 const canvas=document.getElementById("visualizer");
 const ctx=canvas.getContext("2d");
 
 function render(){
 requestAnimationFrame(render);
-analyser.getByteFrequencyData(dataArray);
+analyser.getByteFrequencyData(data);
 ctx.clearRect(0,0,canvas.width,canvas.height);
 
-let barWidth=canvas.width/bufferLength;
-
-for(let i=0;i<bufferLength;i++){
-let h=dataArray[i];
+let w=canvas.width/data.length;
+data.forEach((v,i)=>{
 ctx.fillStyle="rgba(123,47,247,0.8)";
-ctx.fillRect(i*barWidth,canvas.height-h/2,barWidth-2,h/2);
-}
+ctx.fillRect(i*w,canvas.height-v/2,w-2,v/2);
+});
 }
 render();
 }
