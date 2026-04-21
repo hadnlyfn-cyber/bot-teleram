@@ -57,7 +57,7 @@ body {
     height: 140px;
     border-radius: 50%;
     object-fit: cover;
-    box-shadow: 0 0 25px #7b2ff7;
+    box-shadow: 0 0 30px #7b2ff7;
 }
 
 /* VIEWS */
@@ -66,46 +66,70 @@ body {
     margin: 10px;
 }
 
-/* TEXT */
-.typing {
-    color: white;
-    margin-bottom: 20px;
-}
-
 /* BUTTONS */
 .buttons {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 18px;
 }
 
+/* ADVANCED BUTTON */
 .btn-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .btn {
+    position: relative;
     padding: 10px;
     border-radius: 18px;
-    backdrop-filter: blur(10px);
-    background: rgba(255,255,255,0.05);
-    transition: 0.2s;
+    overflow: hidden;
+    cursor: pointer;
+    transition: 0.25s;
+    transform-style: preserve-3d;
+}
+
+/* liquid effect */
+.btn::before {
+    content: "";
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(123,47,247,0.4), transparent);
+    top: -50%;
+    left: -50%;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.btn:hover::before {
+    opacity: 1;
 }
 
 .btn img {
     width: 55px;
     border-radius: 12px;
+    position: relative;
+    z-index: 2;
 }
 
 .btn-text {
     color: white;
     opacity: 0;
+    transform: translateX(-10px);
     transition: 0.3s;
 }
 
 .btn-row:hover .btn-text {
     opacity: 1;
+    transform: translateX(0);
+}
+
+/* hover lift */
+.btn:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 0 25px rgba(123,47,247,0.7);
 }
 
 /* PLAYER */
@@ -117,33 +141,39 @@ body {
     width: 320px;
     padding: 15px;
     border-radius: 20px;
-    background: rgba(0,0,0,0.7);
+    background: rgba(20,20,20,0.8);
     backdrop-filter: blur(10px);
 }
 
 .play-btn {
-    width: 50px;
-    height: 50px;
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
     border: none;
-    background: white;
-    font-size: 18px;
+    background: #7b2ff7;
+    color: white;
+    font-size: 20px;
     cursor: pointer;
+    display: block;
+    margin: auto;
+    transition: 0.2s;
 }
 
+.play-btn:hover {
+    transform: scale(1.1);
+}
+
+/* progress */
 .progress {
     width: 100%;
     margin-top: 10px;
 }
 
-.volume {
-    width: 80px;
-}
-
-.controls {
+.time {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    color: #aaa;
+    font-size: 10px;
 }
 </style>
 </head>
@@ -164,19 +194,17 @@ body {
 
 <div class="views" id="views">👁 0</div>
 
-<div class="typing" id="typing"></div>
-
 <div class="buttons">
 
 <div class="btn-row">
-<a href="https://twitch.tv/ay3ent" class="btn">
+<a href="https://twitch.tv/ay3ent" class="btn tilt">
 <img src="twitch2.png">
 </a>
 <span class="btn-text">twitch</span>
 </div>
 
 <div class="btn-row">
-<a href="https://t.me/ay3ent" class="btn">
+<a href="https://t.me/ay3ent" class="btn tilt">
 <img src="telegram.png">
 </a>
 <span class="btn-text">telegram</span>
@@ -189,12 +217,14 @@ body {
 <!-- PLAYER -->
 <div class="player">
 
-<div class="controls">
 <button id="playBtn" class="play-btn">▶</button>
-<input type="range" id="volume" class="volume" min="0" max="1" step="0.01" value="0.5">
-</div>
 
 <input type="range" id="progress" class="progress" value="0">
+
+<div class="time">
+<span id="current">0:00</span>
+<span id="duration">0:00</span>
+</div>
 
 </div>
 
@@ -202,41 +232,10 @@ body {
 
 </div>
 
-<!-- FIREBASE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyB5YVBwTUnlCLzrZgxuoNhbkdEMDReOJKo",
-  authDomain: "boty-b7a7f.firebaseapp.com",
-  databaseURL: "https://boty-b7a7f-default-rtdb.firebaseio.com/",
-  projectId: "boty-b7a7f",
-  storageBucket: "boty-b7a7f.firebasestorage.app",
-  messagingSenderId: "1011485229092",
-  appId: "1:1011485229092:web:1d3e8c272845b36dcc18b1"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-const viewsRef = ref(db, "views");
-
-get(viewsRef).then((snap)=>{
-let count = snap.exists()?snap.val():0;
-set(viewsRef, count + 1);
-});
-
-onValue(viewsRef, (snap)=>{
-document.getElementById("views").innerText = "👁 " + snap.val();
-});
-</script>
-
 <script>
 let music = document.getElementById("music");
 let playBtn = document.getElementById("playBtn");
 let progress = document.getElementById("progress");
-let volume = document.getElementById("volume");
 
 /* ENTER */
 function enterSite(){
@@ -256,31 +255,36 @@ playBtn.innerHTML="▶";
 }
 };
 
-music.addEventListener("timeupdate", ()=>{
-progress.value = (music.currentTime / music.duration)*100;
-});
+music.onloadedmetadata = ()=>{
+document.getElementById("duration").innerText=format(music.duration);
+};
+
+music.ontimeupdate = ()=>{
+progress.value=(music.currentTime/music.duration)*100;
+document.getElementById("current").innerText=format(music.currentTime);
+};
 
 progress.oninput = ()=>{
-music.currentTime = (progress.value/100)*music.duration;
+music.currentTime=(progress.value/100)*music.duration;
 };
 
-volume.oninput = ()=>{
-music.volume = volume.value;
-};
-
-/* TYPING */
-let words=["ay3ent...","streamer...","developer..."];
-let i=0,j=0;
-
-function type(){
-document.getElementById("typing").innerText = words[i].slice(0,j++);
-if(j>words[i].length){
-j=0;
-i=(i+1)%words.length;
+function format(s){
+let m=Math.floor(s/60);
+let sec=Math.floor(s%60);
+if(sec<10) sec="0"+sec;
+return m+":"+sec;
 }
-setTimeout(type,150);
-}
-type();
+
+/* TILT */
+document.querySelectorAll(".tilt").forEach(el=>{
+el.addEventListener("mousemove",e=>{
+let r=el.getBoundingClientRect();
+let x=e.clientX-r.left;
+let y=e.clientY-r.top;
+el.style.transform=`rotateX(${-(y/r.height-0.5)*15}deg) rotateY(${(x/r.width-0.5)*15}deg)`;
+});
+el.addEventListener("mouseleave",()=>el.style.transform="rotateX(0) rotateY(0)");
+});
 </script>
 
 </body>
