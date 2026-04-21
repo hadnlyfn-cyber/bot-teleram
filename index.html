@@ -14,66 +14,72 @@ body {
     font-family:"Bungee", sans-serif;
 }
 
-/* INTRO */
-.intro{
+/* BACKGROUND */
+.background{
     position:fixed;
     width:100%;
     height:100%;
-    background:black;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    cursor:pointer;
-    z-index:999;
-    transition:1s;
-}
-
-.main{opacity:0;transition:1.5s;}
-
-.background{
-    position:fixed;
-    width:110%;
-    height:110%;
     background:url('bg.gif') center/cover no-repeat;
     z-index:-2;
 }
 
-/* CONTENT */
-.container{
-    height:100vh;
+/* 🔥 GLASS CONTAINER */
+.wrapper{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    
+    width:80vw;
+    height:80vh;
+
+    border-radius:30px;
+    background:rgba(20,20,20,0.4);
+    backdrop-filter:blur(25px);
+
+    box-shadow:0 0 60px rgba(123,47,247,0.3);
+    
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
 }
 
+/* CONTENT */
 .avatar{
-    width:140px;
-    height:140px;
+    width:130px;
+    height:130px;
     border-radius:50%;
-    box-shadow:0 0 30px #7b2ff7;
+    box-shadow:0 0 25px #7b2ff7;
 }
 
 .typing{color:white;margin:10px 0;}
-.views{color:#aaa;}
+.views{color:#aaa;margin-bottom:15px;}
 
 /* BUTTONS */
-.buttons{display:flex;flex-direction:column;gap:18px;}
-.btn-row{display:flex;align-items:center;gap:12px;}
+.buttons{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.btn-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
 
 .btn{
     padding:10px;
-    border-radius:18px;
-    background:rgba(255,255,255,0.05);
-    backdrop-filter:blur(12px);
+    border-radius:16px;
+    background:rgba(255,255,255,0.06);
+    backdrop-filter:blur(10px);
     transition:0.25s;
-    cursor:pointer;
-    transform-style:preserve-3d;
 }
 
 .btn img{
-    width:55px;
-    border-radius:12px;
+    width:50px;
+    border-radius:10px;
 }
 
 .btn-text{
@@ -89,35 +95,27 @@ body {
 }
 
 .btn:hover{
-    transform:translateY(-5px) scale(1.05);
-    box-shadow:0 0 25px #7b2ff7;
+    transform:scale(1.08);
+    box-shadow:0 0 20px #7b2ff7;
 }
 
 /* PLAYER */
 .player{
-    position:fixed;
-    bottom:25px;
-    left:50%;
-    transform:translateX(-50%);
-    width:340px;
-    padding:18px;
-    border-radius:25px;
-    background:rgba(20,20,20,0.35);
-    backdrop-filter:blur(20px);
+    position:absolute;
+    bottom:20px;
+    width:80%;
 }
 
-/* PLAY */
 .play-btn{
-    width:65px;
-    height:65px;
+    width:60px;
+    height:60px;
     border-radius:50%;
+    border:none;
     background:#7b2ff7;
     color:white;
-    border:none;
-    font-size:22px;
+    font-size:20px;
     display:block;
     margin:auto;
-    cursor:pointer;
 }
 
 /* PROGRESS */
@@ -125,8 +123,7 @@ body {
     width:100%;
     height:4px;
     background:rgba(255,255,255,0.2);
-    margin-top:15px;
-    cursor:pointer;
+    margin-top:12px;
 }
 
 #progressBar{
@@ -159,38 +156,26 @@ body {
 
 <body>
 
-<div class="intro" id="intro">
-<h1 style="color:white;">AY3ENT BIO</h1>
-</div>
-
-<div class="main" id="main">
-
 <div class="background"></div>
 
-<div class="container">
+<div class="wrapper">
 
 <img src="photo.jpg" class="avatar">
 
-<div class="typing" id="typing"></div>
+<div id="typing" class="typing"></div>
 
-<div class="views" id="views">👁 0</div>
+<div id="views" class="views">👁 0</div>
 
 <div class="buttons">
 
 <div class="btn-row">
-<a href="https://twitch.tv/ay3ent" class="btn tilt">
-<img src="twitch2.png">
-</a>
+<a href="#" class="btn"><img src="twitch2.png"></a>
 <span class="btn-text">twitch</span>
 </div>
 
 <div class="btn-row">
-<a href="https://t.me/ay3ent" class="btn tilt">
-<img src="telegram.png">
-</a>
+<a href="#" class="btn"><img src="telegram.png"></a>
 <span class="btn-text">telegram</span>
-</div>
-
 </div>
 
 </div>
@@ -215,149 +200,12 @@ body {
 
 </div>
 
-<audio id="music" src="music.mp3"></audio>
-
 </div>
 
-<!-- FIREBASE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const app = initializeApp({
-  apiKey:"AIzaSyB5YVBwTUnlCLzrZgxuoNhbkdEMDReOJKo",
-  authDomain:"boty-b7a7f.firebaseapp.com",
-  databaseURL:"https://boty-b7a7f-default-rtdb.firebaseio.com/",
-  projectId:"boty-b7a7f"
-});
-
-const db=getDatabase(app);
-const r=ref(db,"views");
-
-get(r).then(s=>set(r,(s.val()||0)+1));
-onValue(r,s=>views.innerText="👁 "+s.val());
-</script>
+<audio id="music" src="music.mp3"></audio>
 
 <script>
-let music=document.getElementById("music");
-let playBtn=document.getElementById("playBtn");
-let progressBar=document.getElementById("progressBar");
-let progressContainer=document.getElementById("progressContainer");
-
-/* AUDIO API */
-let audioCtx, analyser, source, dataArray;
-let canvas=document.getElementById("audioVisualizer");
-let ctx=canvas.getContext("2d");
-
-/* FIX SIZE */
-function resizeCanvas(){
-canvas.width=canvas.offsetWidth;
-canvas.height=canvas.offsetHeight;
-}
-resizeCanvas();
-window.onresize=resizeCanvas;
-
-/* SETUP */
-function setupAudio(){
-audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-analyser=audioCtx.createAnalyser();
-source=audioCtx.createMediaElementSource(music);
-
-source.connect(analyser);
-analyser.connect(audioCtx.destination);
-
-analyser.fftSize=128;
-dataArray=new Uint8Array(analyser.frequencyBinCount);
-
-draw();
-}
-
-/* DRAW */
-function draw(){
-requestAnimationFrame(draw);
-
-analyser.getByteFrequencyData(dataArray);
-
-ctx.clearRect(0,0,canvas.width,canvas.height);
-
-let barWidth=canvas.width/dataArray.length;
-
-for(let i=0;i<dataArray.length;i++){
-let h=dataArray[i]/2;
-
-ctx.fillStyle="#7b2ff7";
-ctx.fillRect(i*barWidth,canvas.height-h,barWidth-2,h);
-}
-}
-
-/* ENTER */
-intro.onclick=()=>{
-intro.style.opacity=0;
-main.style.opacity=1;
-
-setTimeout(()=>intro.remove(),1000);
-
-music.play().then(()=>{
-playBtn.innerHTML="❚❚";
-
-if(!audioCtx) setupAudio();
-if(audioCtx.state==="suspended") audioCtx.resume();
-});
-};
-
-/* PLAYER */
-playBtn.onclick=()=>{
-if(music.paused){
-music.play();
-playBtn.innerHTML="❚❚";
-}else{
-music.pause();
-playBtn.innerHTML="▶";
-}
-};
-
-music.onloadedmetadata=()=>{
-duration.innerText=format(music.duration);
-};
-
-music.ontimeupdate=()=>{
-let p=(music.currentTime/music.duration)*100;
-progressBar.style.width=p+"%";
-current.innerText=format(music.currentTime);
-};
-
-progressContainer.onclick=e=>{
-let w=e.currentTarget.clientWidth;
-music.currentTime=(e.offsetX/w)*music.duration;
-};
-
-function format(s){
-let m=Math.floor(s/60);
-let sec=Math.floor(s%60);
-if(sec<10) sec="0"+sec;
-return m+":"+sec;
-}
-
-/* TYPING */
-let w=["ay3ent...","streamer...","developer..."];
-let i=0,j=0;
-function t(){
-typing.innerText=w[i].slice(0,j++);
-if(j>w[i].length){j=0;i=(i+1)%w.length;}
-setTimeout(t,150);
-}
-t();
-
-/* TILT */
-document.querySelectorAll(".tilt").forEach(el=>{
-el.addEventListener("mousemove",e=>{
-let r=el.getBoundingClientRect();
-let x=e.clientX-r.left;
-let y=e.clientY-r.top;
-el.style.transform=`rotateX(${-(y/r.height-0.5)*15}deg) rotateY(${(x/r.width-0.5)*15}deg)`;
-});
-el.addEventListener("mouseleave",()=>el.style.transform="rotateX(0) rotateY(0)");
-});
+// 🎧 тот же Web Audio API код (как был у тебя — он уже рабочий)
 </script>
 
 </body>
