@@ -281,9 +281,18 @@ font-size:11px;
 
 <script>
 /* COUNTAPI */
-fetch("https://api.countapi.xyz/hit/ay3ent-bio/views")
+<script>
+const url = "https://api.countapi.xyz/hit/ay3ent-bio/views?nocache=" + Date.now();
+
+fetch(url)
 .then(r=>r.json())
-.then(d=>views.innerText="👁 "+d.value);
+.then(d=>{
+document.getElementById("views").innerText = "👁 " + d.value;
+})
+.catch(()=>{
+document.getElementById("views").innerText = "👁 error";
+});
+</script>
 
 /* CURSOR */
 let cur=document.getElementById("cursor");
