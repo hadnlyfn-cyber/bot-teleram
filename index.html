@@ -88,14 +88,19 @@ font-size:20px; /* размер текста */
 font-weight:900;
 text-align:center;
 margin-top:10px;
-text-shadow: 0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px #ffffff; /* черно-белый неон */
+text-shadow: 
+  0 0 4px #ffffff, 
+  0 0 10px #ffffff, 
+  0 0 15px #ffffff, 
+  0 0 20px #ffffff, /* неоновый белый */
+  0 0 2px black; /* тонкая черная обводка */
 animation: neonText 1.5s ease-in-out infinite alternate, pulseText 2s ease-in-out infinite;
 }
 
 @keyframes neonText {
-    0% { text-shadow: 0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px #ffffff; }
-    50% { text-shadow: 0 0 8px #ffffff, 0 0 16px #ffffff, 0 0 30px #ffffff, 0 0 60px #ffffff; }
-    100% { text-shadow: 0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px #ffffff; }
+    0% { text-shadow: 0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px #ffffff, 0 0 2px black; }
+    50% { text-shadow: 0 0 8px #ffffff, 0 0 16px #ffffff, 0 0 30px #ffffff, 0 0 60px #ffffff, 0 0 2px black; }
+    100% { text-shadow: 0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px #ffffff, 0 0 2px black; }
 }
 
 @keyframes pulseText {
