@@ -90,7 +90,7 @@ transform: translateY(0); /* аватарка не двигается */
 }
 
 .avatar{width:100%;height:100%;border-radius:50%;}
-#circleVis{position:absolute;width:100%;height:100%;}
+/* Убираем круглый визуализатор (canvas #circleVis) */
 
 /* TYPING (NEON EFFECT) */
 .typing{
@@ -203,7 +203,7 @@ font-size:11px;
 color:#aaa;
 }
 
-/* VIS */
+/* VIS (bars only now) */
 #audioVis{
 position:absolute;
 bottom:0;
@@ -227,7 +227,6 @@ height:60px;
 <div class="wrapper" id="main">
 
 <div class="avatar-wrap">
-<canvas id="circleVis"></canvas>
 <img src="photo.jpg" class="avatar">
 </div>
 
@@ -272,6 +271,9 @@ height:60px;
 </div>
 
 </div>
+
+<!-- Убираем канвас для кругового визуализатора -->
+<!-- <canvas id="circleVis"></canvas> -->
 
 <canvas id="audioVis"></canvas>
 
@@ -341,14 +343,10 @@ volumeIcon.textContent = music.volume==0 ? "🔇" : "🔊";
 /* VIS */
 const c1=document.getElementById("audioVis");
 const ctx1=c1.getContext("2d");
-const c2=document.getElementById("circleVis");
-const ctx2=c2.getContext("2d");
 
 function resize(){
 c1.width=window.innerWidth;
 c1.height=60;
-c2.width=c2.offsetWidth;
-c2.height=c2.offsetHeight;
 }
 resize();
 window.onresize=resize;
@@ -364,26 +362,6 @@ for(let i=0;i<data.length;i++){
 let h=data[i]/2;
 ctx1.fillStyle="#7b2ff7";
 ctx1.fillRect(i*w,c1.height-h,w-2,h);
-}
-
-/* circle */
-ctx2.clearRect(0,0,c2.width,c2.height);
-let cx=c2.width/2;
-let cy=c2.height/2;
-let r=60;
-
-for(let i=0;i<data.length;i++){
-let a=(i/data.length)*Math.PI*2;
-let len=data[i]/3;
-let x1=cx+Math.cos(a)*r;
-let y1=cy+Math.sin(a)*r;
-let x2=cx+Math.cos(a)*(r+len);
-let y2=cy+Math.sin(a)*(r+len);
-ctx2.beginPath();
-ctx2.moveTo(x1,y1);
-ctx2.lineTo(x2,y2);
-ctx2.strokeStyle="#7b2ff7";
-ctx2.stroke();
 }
 }
 
