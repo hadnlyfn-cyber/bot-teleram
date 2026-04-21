@@ -12,19 +12,6 @@ body {
     overflow:hidden;
     background:black;
     font-family:"Bungee", sans-serif;
-    cursor:none;
-}
-
-/* CURSOR */
-.cursor{
-    position:fixed;
-    width:20px;
-    height:20px;
-    border-radius:50%;
-    background:#7b2ff7;
-    pointer-events:none;
-    transform:translate(-50%,-50%);
-    box-shadow:0 0 20px #7b2ff7;
 }
 
 /* INTRO */
@@ -51,14 +38,6 @@ body {
     z-index:-2;
 }
 
-/* PARTICLES */
-canvas{
-    position:fixed;
-    top:0;
-    left:0;
-    z-index:-1;
-}
-
 /* CONTENT */
 .container{
     height:100vh;
@@ -78,8 +57,8 @@ canvas{
 .typing{color:white;margin:10px 0;}
 .views{color:#aaa;}
 
+/* BUTTONS */
 .buttons{display:flex;flex-direction:column;gap:18px;}
-
 .btn-row{display:flex;align-items:center;gap:12px;}
 
 .btn{
@@ -88,9 +67,14 @@ canvas{
     background:rgba(255,255,255,0.05);
     backdrop-filter:blur(12px);
     transition:0.25s;
+    cursor:pointer;
+    transform-style:preserve-3d;
 }
 
-.btn img{width:55px;border-radius:12px;}
+.btn img{
+    width:55px;
+    border-radius:12px;
+}
 
 .btn-text{
     color:white;
@@ -99,10 +83,13 @@ canvas{
     transition:0.3s;
 }
 
-.btn-row:hover .btn-text{opacity:1;transform:translateX(0);}
+.btn-row:hover .btn-text{
+    opacity:1;
+    transform:translateX(0);
+}
 
 .btn:hover{
-    transform:scale(1.1);
+    transform:translateY(-5px) scale(1.05);
     box-shadow:0 0 25px #7b2ff7;
 }
 
@@ -121,36 +108,43 @@ canvas{
 
 /* PLAY */
 .play-btn{
-    width:65px;height:65px;border-radius:50%;
-    background:#7b2ff7;color:white;border:none;
-    font-size:22px;display:block;margin:auto;
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    background:#7b2ff7;
+    color:white;
+    border:none;
+    font-size:22px;
+    display:block;
+    margin:auto;
+    cursor:pointer;
 }
 
 /* PROGRESS */
 .progress-container{
-    width:100%;height:4px;
+    width:100%;
+    height:4px;
     background:rgba(255,255,255,0.2);
     margin-top:15px;
     cursor:pointer;
 }
 
 #progressBar{
-    height:100%;width:0%;
+    height:100%;
+    width:0%;
     background:#7b2ff7;
 }
 
 /* VISUALIZER */
 .visualizer{
-    display:flex;
-    justify-content:center;
-    gap:3px;
+    width:100%;
+    height:60px;
     margin-top:10px;
 }
 
-.bar{
-    width:4px;
-    height:10px;
-    background:#7b2ff7;
+#audioVisualizer{
+    width:100%;
+    height:100%;
 }
 
 /* TIME */
@@ -165,15 +159,11 @@ canvas{
 
 <body>
 
-<div class="cursor" id="cursor"></div>
-
 <div class="intro" id="intro">
 <h1 style="color:white;">AY3ENT BIO</h1>
 </div>
 
 <div class="main" id="main">
-
-<canvas id="particles"></canvas>
 
 <div class="background"></div>
 
@@ -186,46 +176,59 @@ canvas{
 <div class="views" id="views">👁 0</div>
 
 <div class="buttons">
+
 <div class="btn-row">
-<a href="#" class="btn"><img src="twitch2.png"></a>
+<a href="https://twitch.tv/ay3ent" class="btn tilt">
+<img src="twitch2.png">
+</a>
 <span class="btn-text">twitch</span>
 </div>
 
 <div class="btn-row">
-<a href="#" class="btn"><img src="telegram.png"></a>
+<a href="https://t.me/ay3ent" class="btn tilt">
+<img src="telegram.png">
+</a>
 <span class="btn-text">telegram</span>
 </div>
-</div>
 
 </div>
 
+</div>
+
+<!-- PLAYER -->
 <div class="player">
+
 <button id="playBtn" class="play-btn">▶</button>
 
 <div class="progress-container" id="progressContainer">
 <div id="progressBar"></div>
 </div>
 
-<div class="visualizer" id="visualizer"></div>
+<div class="visualizer">
+<canvas id="audioVisualizer"></canvas>
+</div>
 
 <div class="time">
 <span id="current">0:00</span>
 <span id="duration">0:00</span>
 </div>
+
 </div>
 
 <audio id="music" src="music.mp3"></audio>
 
 </div>
 
+<!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const app = initializeApp({
-  apiKey:"AIza...",
+  apiKey:"AIzaSyB5YVBwTUnlCLzrZgxuoNhbkdEMDReOJKo",
   authDomain:"boty-b7a7f.firebaseapp.com",
-  databaseURL:"https://boty-b7a7f-default-rtdb.firebaseio.com/"
+  databaseURL:"https://boty-b7a7f-default-rtdb.firebaseio.com/",
+  projectId:"boty-b7a7f"
 });
 
 const db=getDatabase(app);
@@ -238,37 +241,102 @@ onValue(r,s=>views.innerText="👁 "+s.val());
 <script>
 let music=document.getElementById("music");
 let playBtn=document.getElementById("playBtn");
+let progressBar=document.getElementById("progressBar");
+let progressContainer=document.getElementById("progressContainer");
 
-/* ENTER + MUSIC */
+/* AUDIO API */
+let audioCtx, analyser, source, dataArray;
+let canvas=document.getElementById("audioVisualizer");
+let ctx=canvas.getContext("2d");
+
+/* FIX SIZE */
+function resizeCanvas(){
+canvas.width=canvas.offsetWidth;
+canvas.height=canvas.offsetHeight;
+}
+resizeCanvas();
+window.onresize=resizeCanvas;
+
+/* SETUP */
+function setupAudio(){
+audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+analyser=audioCtx.createAnalyser();
+source=audioCtx.createMediaElementSource(music);
+
+source.connect(analyser);
+analyser.connect(audioCtx.destination);
+
+analyser.fftSize=128;
+dataArray=new Uint8Array(analyser.frequencyBinCount);
+
+draw();
+}
+
+/* DRAW */
+function draw(){
+requestAnimationFrame(draw);
+
+analyser.getByteFrequencyData(dataArray);
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+let barWidth=canvas.width/dataArray.length;
+
+for(let i=0;i<dataArray.length;i++){
+let h=dataArray[i]/2;
+
+ctx.fillStyle="#7b2ff7";
+ctx.fillRect(i*barWidth,canvas.height-h,barWidth-2,h);
+}
+}
+
+/* ENTER */
 intro.onclick=()=>{
 intro.style.opacity=0;
 main.style.opacity=1;
+
 setTimeout(()=>intro.remove(),1000);
 
-music.play().then(()=>playBtn.innerHTML="❚❚");
+music.play().then(()=>{
+playBtn.innerHTML="❚❚";
+
+if(!audioCtx) setupAudio();
+if(audioCtx.state==="suspended") audioCtx.resume();
+});
 };
 
 /* PLAYER */
 playBtn.onclick=()=>{
-if(music.paused){music.play();playBtn.innerHTML="❚❚";}
-else{music.pause();playBtn.innerHTML="▶";}
+if(music.paused){
+music.play();
+playBtn.innerHTML="❚❚";
+}else{
+music.pause();
+playBtn.innerHTML="▶";
+}
 };
 
-/* VISUALIZER */
-let vis=document.getElementById("visualizer");
-for(let i=0;i<20;i++){
-let b=document.createElement("div");
-b.className="bar";
-vis.appendChild(b);
-}
+music.onloadedmetadata=()=>{
+duration.innerText=format(music.duration);
+};
 
-setInterval(()=>{
-if(!music.paused){
-document.querySelectorAll(".bar").forEach(b=>{
-b.style.height=(5+Math.random()*25)+"px";
-});
+music.ontimeupdate=()=>{
+let p=(music.currentTime/music.duration)*100;
+progressBar.style.width=p+"%";
+current.innerText=format(music.currentTime);
+};
+
+progressContainer.onclick=e=>{
+let w=e.currentTarget.clientWidth;
+music.currentTime=(e.offsetX/w)*music.duration;
+};
+
+function format(s){
+let m=Math.floor(s/60);
+let sec=Math.floor(s%60);
+if(sec<10) sec="0"+sec;
+return m+":"+sec;
 }
-},120);
 
 /* TYPING */
 let w=["ay3ent...","streamer...","developer..."];
@@ -280,33 +348,16 @@ setTimeout(t,150);
 }
 t();
 
-/* CURSOR */
-document.onmousemove=e=>{
-cursor.style.left=e.clientX+"px";
-cursor.style.top=e.clientY+"px";
-};
-
-/* PARTICLES */
-let c=document.getElementById("particles");
-let ctx=c.getContext("2d");
-c.width=innerWidth;c.height=innerHeight;
-
-let p=[];
-for(let i=0;i<50;i++){
-p.push({x:Math.random()*c.width,y:Math.random()*c.height});
-}
-
-function draw(){
-ctx.clearRect(0,0,c.width,c.height);
-ctx.fillStyle="#7b2ff7";
-p.forEach(pt=>{
-ctx.fillRect(pt.x,pt.y,2,2);
-pt.y+=0.3;
-if(pt.y>c.height) pt.y=0;
+/* TILT */
+document.querySelectorAll(".tilt").forEach(el=>{
+el.addEventListener("mousemove",e=>{
+let r=el.getBoundingClientRect();
+let x=e.clientX-r.left;
+let y=e.clientY-r.top;
+el.style.transform=`rotateX(${-(y/r.height-0.5)*15}deg) rotateY(${(x/r.width-0.5)*15}deg)`;
 });
-requestAnimationFrame(draw);
-}
-draw();
+el.addEventListener("mouseleave",()=>el.style.transform="rotateX(0) rotateY(0)");
+});
 </script>
 
 </body>
