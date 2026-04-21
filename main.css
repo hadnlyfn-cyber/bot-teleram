@@ -162,5 +162,20 @@ height:55px;
 .typing{
 font-size:13px;
 }
+@media (max-width:768px){
 
+.wrapper{
+justify-content:flex-start;
+padding-top:30px;
+overflow-y:auto; /* 🔥 теперь можно скроллить */
+}
+
+.player{
+position:relative;
+width:100%;
+margin-top:25px;
+margin-bottom:20px;
+}
+
+}
 }
