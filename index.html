@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>AY3ENT 3D</title>
+<title>AY3ENT</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
 
@@ -25,56 +25,70 @@ body {
     align-items: center;
     z-index: 999;
     cursor: pointer;
-    transition: 1s;
+    transition: opacity 1s ease;
 }
 
 .intro-text {
     color: white;
-    font-size: 42px;
-    text-shadow: 0 0 30px #7b2ff7;
+    font-size: 40px;
+    text-shadow: 0 0 25px #7b2ff7;
 }
 
-/* UI OVERLAY */
-.ui {
+/* MAIN */
+.main {
+    opacity: 0;
+    transition: opacity 1.5s ease;
+}
+
+/* BACKGROUND */
+.background {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
+    width: 110%;
+    height: 110%;
+    background: url('bg.gif') center/cover no-repeat;
+    z-index: -1;
 }
 
-/* CENTER UI */
-.center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: auto;
-    text-align: center;
+/* CONTENT */
+.container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
+/* AVATAR */
 .avatar {
     width: 140px;
+    height: 140px;
     border-radius: 50%;
-    box-shadow: 0 0 30px #7b2ff7;
+    box-shadow: 0 0 25px #7b2ff7;
     margin-bottom: 15px;
 }
 
+/* TYPING */
 .typing {
     color: white;
     margin-bottom: 20px;
+    height: 20px;
 }
 
 /* BUTTONS */
 .buttons {
     display: flex;
     flex-direction: column;
+    gap: 15px;
+}
+
+.btn-row {
+    display: flex;
+    align-items: center;
     gap: 10px;
 }
 
 .btn img {
-    width: 90px;
+    width: 85px;
     border-radius: 20px;
     transition: 0.2s;
 }
@@ -83,25 +97,95 @@ body {
     transform: scale(1.1);
 }
 
-/* PLAYER */
+/* TEXT ON HOVER */
+.btn-text {
+    color: white;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.btn-row:hover .btn-text {
+    opacity: 1;
+}
+
+/* 🎧 PLAYER */
 .player {
-    position: absolute;
+    position: fixed;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 320px;
-    padding: 10px;
+    width: 300px;
+    padding: 12px;
     border-radius: 20px;
     background: rgba(0,0,0,0.7);
     backdrop-filter: blur(10px);
-    pointer-events: auto;
+    box-shadow: 0 0 20px rgba(123,47,247,0.5);
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 6px;
 }
 
 .play-btn {
     width: 40px;
     height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    color: black;
+    font-size: 16px;
+    cursor: pointer;
 }
 
+.progress {
+    width: 100%;
+    appearance: none;
+    height: 4px;
+    background: #555;
+}
+
+.progress::-webkit-slider-thumb {
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    background: white;
+    border-radius: 50%;
+}
+
+.bottom {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+}
+
+.time {
+    color: #aaa;
+    font-size: 10px;
+}
+
+.volume {
+    width: 70px;
+    appearance: none;
+    height: 4px;
+    background: #777;
+}
+
+.volume::-webkit-slider-thumb {
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    background: white;
+    border-radius: 50%;
+}
+
+/* MOBILE */
+@media(max-width:600px){
+    .avatar {width:100px;height:100px;}
+    .btn img {width:65px;}
+    .player {width:260px;}
+}
 </style>
 </head>
 
@@ -111,88 +195,77 @@ body {
 <div class="intro-text">AY3ENT BIO</div>
 </div>
 
-<div id="scene"></div>
+<div class="main" id="main">
 
-<div class="ui">
+<div class="background"></div>
 
-<div class="center">
+<div class="container">
+
 <img src="photo.jpg" class="avatar">
 
 <div class="typing" id="typing"></div>
 
 <div class="buttons">
-<a href="https://twitch.tv/ay3ent" class="btn"><img src="twitch2.png"></a>
-<a href="https://t.me/ay3ent" class="btn"><img src="telegram.png"></a>
-</div>
+
+<div class="btn-row">
+<a href="https://twitch.tv/ay3ent" class="btn">
+<img src="twitch2.png">
+</a>
+<span class="btn-text">twitch</span>
 </div>
 
+<div class="btn-row">
+<a href="https://t.me/ay3ent" class="btn">
+<img src="telegram.png">
+</a>
+<span class="btn-text">telegram</span>
+</div>
+
+</div>
+
+</div>
+
+<!-- PLAYER -->
 <div class="player">
-<button id="playBtn">▶</button>
-<input type="range" id="volume" min="0" max="1" step="0.01">
+
+<div class="controls">
+<button id="playBtn" class="play-btn">▶</button>
+</div>
+
+<input type="range" id="progress" class="progress" value="0">
+
+<div class="bottom">
+<span id="currentTime" class="time">0:00</span>
+
+<input type="range" id="volume" class="volume" min="0" max="1" step="0.01" value="0.5">
+
+<span id="duration" class="time">0:00</span>
 </div>
 
 </div>
 
 <audio id="music" src="music.mp3"></audio>
 
-<!-- THREE -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</div>
 
 <script>
-let scene, camera, renderer, sphere;
-
-/* INIT 3D */
-scene = new THREE.Scene();
-
-camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-camera.position.z = 5;
-
-renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.getElementById("scene").appendChild(renderer.domElement);
-
-/* LIGHT */
-let light = new THREE.PointLight(0x7b2ff7, 2);
-light.position.set(2,2,5);
-scene.add(light);
-
-/* OBJECT */
-let geometry = new THREE.SphereGeometry(1.5, 64, 64);
-let material = new THREE.MeshStandardMaterial({
-color: 0x7b2ff7,
-wireframe: true
-});
-sphere = new THREE.Mesh(geometry, material);
-scene.add(sphere);
-
-/* ANIMATE */
-function animate(){
-requestAnimationFrame(animate);
-sphere.rotation.y += 0.01;
-renderer.render(scene, camera);
-}
-animate();
-
-/* PARALLAX CAMERA */
-document.addEventListener("mousemove", e=>{
-let x = (e.clientX/window.innerWidth - 0.5)*2;
-let y = (e.clientY/window.innerHeight - 0.5)*2;
-camera.position.x = x;
-camera.position.y = -y;
-});
+let music = document.getElementById("music");
+let playBtn = document.getElementById("playBtn");
+let progress = document.getElementById("progress");
+let volume = document.getElementById("volume");
+let currentTime = document.getElementById("currentTime");
+let duration = document.getElementById("duration");
 
 /* ENTER */
 function enterSite(){
 document.querySelector(".intro").style.opacity="0";
+document.getElementById("main").style.opacity="1";
 setTimeout(()=>document.querySelector(".intro").remove(),1000);
+music.play();
 }
 
-/* AUDIO */
-let music = document.getElementById("music");
-let playBtn = document.getElementById("playBtn");
-let volume = document.getElementById("volume");
-
-playBtn.onclick=()=>{
+/* PLAY */
+playBtn.onclick = ()=>{
 if(music.paused){
 music.play();
 playBtn.innerHTML="❚❚";
@@ -202,19 +275,52 @@ playBtn.innerHTML="▶";
 }
 };
 
-volume.oninput=()=>music.volume=volume.value;
+/* TIME */
+music.addEventListener("loadedmetadata", ()=>{
+duration.innerText = formatTime(music.duration);
+});
 
-/* TYPING */
-let words=["ay3ent...","streamer...","developer..."];
-let i=0,j=0;
+music.addEventListener("timeupdate", ()=>{
+progress.value = (music.currentTime / music.duration)*100;
+currentTime.innerText = formatTime(music.currentTime);
+});
+
+/* SEEK */
+progress.addEventListener("input", ()=>{
+music.currentTime = (progress.value/100)*music.duration;
+});
+
+/* VOLUME */
+volume.addEventListener("input", ()=>{
+music.volume = volume.value;
+});
+
+/* FORMAT TIME */
+function formatTime(sec){
+let m = Math.floor(sec/60);
+let s = Math.floor(sec%60);
+if(s<10)s="0"+s;
+return m+":"+s;
+}
+
+/* ⚡ TYPING (БЫСТРЕЕ) */
+let words = ["ay3ent...", "streamer...", "developer..."];
+let i=0, j=0;
 
 function type(){
-document.getElementById("typing").innerText=words[i].slice(0,j++);
-if(j>words[i].length){
-j=0;i=(i+1)%words.length;
+document.getElementById("typing").innerText = words[i].slice(0,j);
+j++;
+
+if(j > words[i].length){
+setTimeout(()=>{
+j=0;
+i = (i+1)%words.length;
+}, 1000);
 }
-setTimeout(type,200);
+
+setTimeout(type, 180); // быстрее (было 240)
 }
+
 type();
 </script>
 
