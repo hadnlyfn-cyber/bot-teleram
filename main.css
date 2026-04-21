@@ -116,3 +116,10 @@ body {
     color: #aaa;
     font-size: 11px;
 }
+
+.btn {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+text-decoration: none;
+}
