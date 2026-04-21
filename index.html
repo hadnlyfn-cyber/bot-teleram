@@ -11,6 +11,7 @@ body {
     margin: 0;
     overflow: hidden;
     font-family: "Bungee", sans-serif;
+    background: black;
 }
 
 /* INTRO */
@@ -24,7 +25,8 @@ body {
     align-items: center;
     z-index: 999;
     cursor: pointer;
-    transition: 1s;
+    opacity: 1;
+    transition: opacity 1.2s ease;
 }
 
 .intro-text {
@@ -44,8 +46,7 @@ body {
 /* MAIN */
 .main {
     opacity: 0;
-    filter: blur(10px);
-    transition: 1.2s ease;
+    transition: opacity 1.5s ease;
 }
 
 /* PARTICLES */
@@ -113,6 +114,10 @@ canvas {
     filter: drop-shadow(0 0 15px #7b2ff7);
 }
 
+.btn-img:active {
+    transform: scale(0.95);
+}
+
 .btn-text {
     color: white;
     opacity: 0;
@@ -139,6 +144,7 @@ canvas {
     width: 4px;
     height: 10px;
     background: #7b2ff7;
+    box-shadow: 0 0 10px #7b2ff7;
 }
 
 /* MUSIC */
@@ -151,6 +157,10 @@ canvas {
     background: rgba(255,255,255,0.08);
     backdrop-filter: blur(10px);
     border-radius: 20px;
+}
+
+.volume {
+    width: 100px;
 }
 </style>
 </head>
@@ -213,22 +223,23 @@ let volume = document.getElementById("volume");
 
 let audioCtx, analyser, source;
 
-// ENTER
+// ENTER (БЕЗ ВСПЫШКИ)
 function enterSite() {
-    document.querySelector(".intro").style.opacity = "0";
-    document.querySelector(".intro").style.filter = "blur(10px)";
-
-    setTimeout(() => {
-        document.querySelector(".intro").style.display = "none";
-        document.getElementById("main").style.opacity = "1";
-        document.getElementById("main").style.filter = "blur(0)";
-    }, 800);
+    let intro = document.querySelector(".intro");
+    let main = document.getElementById("main");
 
     clickSound.play();
     music.play();
 
     setupAudio();
     animate();
+
+    intro.style.opacity = "0";
+    main.style.opacity = "1";
+
+    setTimeout(() => {
+        intro.style.display = "none";
+    }, 1200);
 }
 
 // AUDIO
@@ -304,7 +315,7 @@ function drawParticles() {
 
 drawParticles();
 
-// volume
+// VOLUME
 volume.addEventListener("input", () => {
     music.volume = volume.value;
 });
