@@ -7,182 +7,216 @@
 <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
 
 <style>
-body {
-    margin:0;
-    overflow:hidden;
-    background:black;
-    font-family:"Bungee", sans-serif;
+body{
+margin:0;
+overflow:hidden;
+background:black;
+font-family:"Bungee",sans-serif;
 }
 
-/* BACKGROUND */
+/* INTRO */
+.intro{
+position:fixed;
+width:100%;
+height:100%;
+background:black;
+display:flex;
+justify-content:center;
+align-items:center;
+cursor:pointer;
+z-index:999;
+transition:opacity 1s ease;
+}
+
+/* BG */
 .background{
-    position:fixed;
-    width:100%;
-    height:100%;
-    background:url('bg.gif') center/cover no-repeat;
-    z-index:-2;
+position:fixed;
+width:100%;
+height:100%;
+background:url('bg.gif') center/cover no-repeat;
+z-index:-2;
 }
 
-/* 🔥 GLASS CONTAINER */
+/* GLASS */
 .wrapper{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    
-    width:80vw;
-    height:80vh;
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:80vw;
+height:80vh;
 
-    border-radius:30px;
-    background:rgba(20,20,20,0.4);
-    backdrop-filter:blur(25px);
+border-radius:30px;
+background:rgba(20,20,20,0.4);
+backdrop-filter:blur(25px);
 
-    box-shadow:0 0 60px rgba(123,47,247,0.3);
-    
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
+box-shadow:
+0 0 60px rgba(123,47,247,0.3),
+inset 0 0 40px rgba(123,47,247,0.1);
+
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+
+opacity:0;
+transition:opacity 1.5s ease;
 }
 
-/* CONTENT */
+/* TEXT */
+.typing{
+color:white;
+font-size:14px;
+margin-bottom:15px;
+height:20px;
+}
+
+/* AVATAR */
 .avatar{
-    width:130px;
-    height:130px;
-    border-radius:50%;
-    box-shadow:0 0 25px #7b2ff7;
+width:130px;
+height:130px;
+border-radius:50%;
+box-shadow:0 0 25px #7b2ff7;
 }
 
-.typing{color:white;margin:10px 0;}
-.views{color:#aaa;margin-bottom:15px;}
+/* VIEWS */
+.views{
+color:#aaa;
+margin:10px 0;
+}
 
 /* BUTTONS */
 .buttons{
-    display:flex;
-    flex-direction:column;
-    gap:15px;
+display:flex;
+flex-direction:column;
+gap:15px;
 }
 
 .btn-row{
-    display:flex;
-    align-items:center;
-    gap:10px;
+display:flex;
+align-items:center;
+gap:10px;
 }
 
 .btn{
-    padding:10px;
-    border-radius:16px;
-    background:rgba(255,255,255,0.06);
-    backdrop-filter:blur(10px);
-    transition:0.25s;
+padding:10px;
+border-radius:16px;
+background:rgba(255,255,255,0.06);
+backdrop-filter:blur(10px);
+transition:0.25s;
 }
 
 .btn img{
-    width:50px;
-    border-radius:10px;
+width:50px;
+border-radius:10px;
 }
 
 .btn-text{
-    color:white;
-    opacity:0;
-    transform:translateX(-10px);
-    transition:0.3s;
+color:white;
+opacity:0;
+transform:translateX(-10px);
+transition:0.3s;
 }
 
 .btn-row:hover .btn-text{
-    opacity:1;
-    transform:translateX(0);
+opacity:1;
+transform:translateX(0);
 }
 
 .btn:hover{
-    transform:scale(1.08);
-    box-shadow:0 0 20px #7b2ff7;
+transform:translateY(-4px) scale(1.06);
+box-shadow:0 0 20px #7b2ff7;
 }
 
 /* PLAYER */
 .player{
-    position:absolute;
-    bottom:20px;
-    width:80%;
+position:absolute;
+bottom:20px;
+width:80%;
 }
 
 .play-btn{
-    width:60px;
-    height:60px;
-    border-radius:50%;
-    border:none;
-    background:#7b2ff7;
-    color:white;
-    font-size:20px;
-    display:block;
-    margin:auto;
+width:60px;
+height:60px;
+border-radius:50%;
+border:none;
+background:#7b2ff7;
+color:white;
+font-size:20px;
+display:block;
+margin:auto;
+cursor:pointer;
 }
 
 /* PROGRESS */
 .progress-container{
-    width:100%;
-    height:4px;
-    background:rgba(255,255,255,0.2);
-    margin-top:12px;
+width:100%;
+height:4px;
+background:rgba(255,255,255,0.2);
+margin-top:12px;
+cursor:pointer;
 }
 
 #progressBar{
-    height:100%;
-    width:0%;
-    background:#7b2ff7;
+height:100%;
+width:0%;
+background:#7b2ff7;
 }
 
 /* VISUALIZER */
 .visualizer{
-    width:100%;
-    height:60px;
-    margin-top:10px;
+width:100%;
+height:60px;
+margin-top:10px;
 }
 
 #audioVisualizer{
-    width:100%;
-    height:100%;
+width:100%;
+height:100%;
 }
 
 /* TIME */
 .time{
-    display:flex;
-    justify-content:space-between;
-    font-size:11px;
-    color:#aaa;
+display:flex;
+justify-content:space-between;
+font-size:11px;
+color:#aaa;
 }
 </style>
 </head>
 
 <body>
 
+<div class="intro" id="intro">
+<h1 style="color:white;">AY3ENT BIO</h1>
+</div>
+
 <div class="background"></div>
 
-<div class="wrapper">
+<div class="wrapper" id="main">
+
+<!-- 🔥 ТЕКСТ НАД АВАТАРКОЙ -->
+<div id="typing" class="typing"></div>
 
 <img src="photo.jpg" class="avatar">
-
-<div id="typing" class="typing"></div>
 
 <div id="views" class="views">👁 0</div>
 
 <div class="buttons">
 
 <div class="btn-row">
-<a href="#" class="btn"><img src="twitch2.png"></a>
+<a href="#" class="btn tilt"><img src="twitch2.png"></a>
 <span class="btn-text">twitch</span>
 </div>
 
 <div class="btn-row">
-<a href="#" class="btn"><img src="telegram.png"></a>
+<a href="#" class="btn tilt"><img src="telegram.png"></a>
 <span class="btn-text">telegram</span>
 </div>
 
 </div>
 
-<!-- PLAYER -->
 <div class="player">
-
 <button id="playBtn" class="play-btn">▶</button>
 
 <div class="progress-container" id="progressContainer">
@@ -197,7 +231,6 @@ body {
 <span id="current">0:00</span>
 <span id="duration">0:00</span>
 </div>
-
 </div>
 
 </div>
@@ -205,7 +238,104 @@ body {
 <audio id="music" src="music.mp3"></audio>
 
 <script>
-// 🎧 тот же Web Audio API код (как был у тебя — он уже рабочий)
+let music=document.getElementById("music");
+let playBtn=document.getElementById("playBtn");
+
+/* AUDIO API */
+let audioCtx, analyser, source, dataArray;
+let canvas=document.getElementById("audioVisualizer");
+let ctx=canvas.getContext("2d");
+
+function resizeCanvas(){
+canvas.width=canvas.offsetWidth;
+canvas.height=canvas.offsetHeight;
+}
+resizeCanvas();
+window.onresize=resizeCanvas;
+
+function setupAudio(){
+audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+analyser=audioCtx.createAnalyser();
+source=audioCtx.createMediaElementSource(music);
+
+source.connect(analyser);
+analyser.connect(audioCtx.destination);
+
+analyser.fftSize=128;
+dataArray=new Uint8Array(analyser.frequencyBinCount);
+
+draw();
+}
+
+function draw(){
+requestAnimationFrame(draw);
+analyser.getByteFrequencyData(dataArray);
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+let w=canvas.width/dataArray.length;
+
+for(let i=0;i<dataArray.length;i++){
+let h=dataArray[i]/2;
+ctx.fillStyle="#7b2ff7";
+ctx.fillRect(i*w,canvas.height-h,w-2,h);
+}
+}
+
+/* ENTER */
+intro.onclick=()=>{
+intro.style.opacity=0;
+main.style.opacity=1;
+
+setTimeout(()=>intro.remove(),1000);
+
+music.play().then(()=>{
+playBtn.innerHTML="❚❚";
+
+if(!audioCtx) setupAudio();
+if(audioCtx.state==="suspended") audioCtx.resume();
+});
+};
+
+/* PLAYER */
+playBtn.onclick=()=>{
+if(music.paused){
+music.play();
+playBtn.innerHTML="❚❚";
+}else{
+music.pause();
+playBtn.innerHTML="▶";
+}
+};
+
+/* 🔥 ИДЕАЛЬНЫЙ TYPING */
+let words=["ay3ent","streamer","developer"];
+let i=0,j=0,del=false;
+
+function type(){
+let txt=words[i];
+
+if(!del){
+typing.innerHTML=txt.slice(0,j++)+"|";
+if(j>txt.length){del=true;setTimeout(type,700);return;}
+}else{
+typing.innerHTML=txt.slice(0,j--)+"|";
+if(j<0){del=false;i=(i+1)%words.length;}
+}
+
+setTimeout(type,100);
+}
+type();
+
+/* TILT */
+document.querySelectorAll(".tilt").forEach(el=>{
+el.addEventListener("mousemove",e=>{
+let r=el.getBoundingClientRect();
+let x=e.clientX-r.left;
+let y=e.clientY-r.top;
+el.style.transform=`rotateX(${-(y/r.height-0.5)*15}deg) rotateY(${(x/r.width-0.5)*15}deg)`;
+});
+el.addEventListener("mouseleave",()=>el.style.transform="rotateX(0) rotateY(0)");
+});
 </script>
 
 </body>
