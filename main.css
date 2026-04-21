@@ -49,22 +49,11 @@
 body {
     background: black;
 }
-.player {
-    position: fixed;
-    bottom: 25px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 340px;
-    padding: 18px;
-    border-radius: 25px;
-
-    background: rgba(20,20,20,0.35);
-    backdrop-filter: blur(20px);
-
-    box-shadow: 0 0 40px rgba(123,47,247,0.3);
-    transition: 0.3s;
+.player{
+position:relative; /* было absolute */
+width:80%;
+margin-top:20px;
 }
-
 /* hover усиление */
 .player:hover {
     background: rgba(20,20,20,0.55);
