@@ -19,19 +19,20 @@ overflow:hidden;
 /* cursor */
 .cursor{
 position:fixed;
-width:12px;
-height:12px;
+width:10px;
+height:10px;
 background:white;
 border:2px solid #7b2ff7;
 border-radius:50%;
 transform:translate(-50%,-50%);
 pointer-events:none;
 z-index:9999;
+box-shadow:0 0 10px #7b2ff7;
 }
 .cursor-follower{
 position:fixed;
-width:35px;
-height:35px;
+width:30px;
+height:30px;
 border:1px solid rgba(255,255,255,0.3);
 border-radius:50%;
 pointer-events:none;
@@ -76,42 +77,81 @@ display:flex;
 flex-direction:column;
 align-items:center;
 padding-top:40px;
-gap:10px;
+gap:15px;
 opacity:0;
 transition:1.2s;
+overflow:hidden;
 }
 
 /* avatar */
 .avatar-wrap{
 position:relative;
-width:140px;
-height:140px;
+width:150px;
+height:150px;
 }
 .avatar{
 width:100%;
 height:100%;
 border-radius:50%;
 }
+#circleVis{
+position:absolute;
+width:100%;
+height:100%;
+}
+
+/* typing */
+.typing{color:white;height:20px;}
 
 /* buttons */
-.buttons{
-display:flex;
-flex-direction:column;
-gap:15px;
+.buttons{display:flex;flex-direction:column;gap:15px;}
+.btn-row{display:flex;align-items:center;gap:10px;}
+.btn img{width:50px;border-radius:10px;}
+.btn-text{
+color:white;
+opacity:0;
+transition:0.3s;
 }
-.btn-row{
-display:flex;
-align-items:center;
-gap:10px;
-}
-.btn img{
-width:50px;
-}
+.btn-row:hover .btn-text{opacity:1;}
 
-/* player */
+/* PLAYER */
 .player{
 width:80%;
-margin-top:20px;
+margin-top:10px;
+}
+
+.play-btn{
+width:60px;
+height:60px;
+border-radius:50%;
+background:#7b2ff7;
+border:none;
+color:white;
+display:block;
+margin:auto;
+cursor:pointer;
+box-shadow:0 0 20px #7b2ff7;
+}
+
+/* progress */
+.progress-container{
+width:100%;
+height:4px;
+background:rgba(255,255,255,0.2);
+margin-top:10px;
+cursor:pointer;
+}
+#progressBar{
+height:100%;
+width:0%;
+background:#7b2ff7;
+}
+
+/* visualizer */
+.visualizer{
+width:100%;
+height:50px;
+margin-top:10px;
 }
 
 /* mobile */
@@ -141,32 +181,42 @@ overflow-y:auto;
 
 <div class="wrapper" id="main">
 
-<div id="typing" style="color:white;"></div>
+<div id="typing" class="typing"></div>
 
 <div class="avatar-wrap">
+<canvas id="circleVis"></canvas>
 <img src="photo.jpg" class="avatar">
 </div>
 
-<div id="views" style="color:#aaa;">👁 ...</div>
+<div id="views" style="color:#aaa;">👁 0</div>
 
 <div class="buttons">
 <div class="btn-row">
 <a href="https://twitch.tv/ay3ent" target="_blank">
 <img src="twitch2.png">
 </a>
-<span style="color:white;">twitch</span>
+<span class="btn-text">twitch</span>
 </div>
 
 <div class="btn-row">
 <a href="https://t.me/ay3ent" target="_blank">
 <img src="telegram.png">
 </a>
-<span style="color:white;">telegram</span>
+<span class="btn-text">telegram</span>
 </div>
 </div>
 
 <div class="player">
-<button id="playBtn">▶</button>
+<button id="playBtn" class="play-btn">▶</button>
+
+<div class="progress-container" id="progressContainer">
+<div id="progressBar"></div>
+</div>
+
+<div class="visualizer">
+<canvas id="audioVis"></canvas>
+</div>
+
 </div>
 
 </div>
@@ -177,84 +227,92 @@ overflow-y:auto;
 
 <script>
 
+/* SUPABASE */
+(async()=>{
+const supabase = window.supabase.createClient(
+  "https://ionsrvajvxpifitqljgo.supabase.co",
+  "ВСТАВЬ_СЮДА_СВОЙ_КЛЮЧ"
+);
+
+let uid = localStorage.getItem("uid");
+if(!uid){
+  uid = crypto.randomUUID();
+  localStorage.setItem("uid", uid);
+  await supabase.from("views").insert([{ user_id: uid }]);
+}
+
+let { count } = await supabase
+.from("views")
+.select("*", { count:"exact", head:true });
+
+views.innerText = "👁 " + (count || 0);
+})();
+
 /* cursor */
-let cur=document.getElementById("cursor");
-let fol=document.getElementById("cursorFollower");
-
+let cur=cursor, fol=cursorFollower;
 let x=0,y=0,fx=0,fy=0;
-
 document.onmousemove=e=>{
 x=e.clientX;y=e.clientY;
 cur.style.left=x+"px";
 cur.style.top=y+"px";
 };
-
-function loop(){
+(function loop(){
 fx+=(x-fx)*0.15;
 fy+=(y-fy)*0.15;
 fol.style.left=fx+"px";
 fol.style.top=fy+"px";
 requestAnimationFrame(loop);
-}
-loop();
-
-/* typing */
-let words=["ay3ent","streamer","developer"];
-let i=0,j=0;
-(function type(){
-typing.innerHTML=words[i].slice(0,j)+"|";
-j++;
-if(j>words[i].length+2){j=0;i=(i+1)%words.length;}
-setTimeout(type,120);
 })();
 
 /* audio */
-const musicEl=document.getElementById("music");
-const playBtn=document.getElementById("playBtn");
+const music = document.getElementById("music");
+const playBtn = document.getElementById("playBtn");
 
-playBtn.onclick=()=>{
-if(musicEl.paused){
-musicEl.play();
-playBtn.innerText="❚❚";
-}else{
-musicEl.pause();
-playBtn.innerText="▶";
+const ctx = new AudioContext();
+const analyser = ctx.createAnalyser();
+const src = ctx.createMediaElementSource(music);
+src.connect(analyser);
+analyser.connect(ctx.destination);
+
+const data = new Uint8Array(analyser.frequencyBinCount);
+
+function draw(){
+requestAnimationFrame(draw);
+analyser.getByteFrequencyData(data);
+
+let c = audioVis.getContext("2d");
+c.clearRect(0,0,audioVis.width,audioVis.height);
+
+let w = audioVis.width/data.length;
+for(let i=0;i<data.length;i++){
+let h=data[i]/2;
+c.fillStyle="#7b2ff7";
+c.fillRect(i*w,audioVis.height-h,w-2,h);
 }
-};
+}
 
-/* intro */
+/* enter */
 intro.onclick=()=>{
 intro.style.opacity=0;
 main.style.opacity=1;
 setTimeout(()=>intro.remove(),800);
 
-musicEl.play().catch(()=>{});
+music.play();
+ctx.resume();
+draw();
+playBtn.innerHTML="❚❚";
 };
 
-/* 🔥 SUPABASE SAFE */
-try{
-const supabase = window.supabase.createClient(
-  "https://ionsrvajvxpifitqljgo.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlvbnNydmFqdnhwaWZpdHFsamdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MjAzMzUsImV4cCI6MjA5MjI5NjMzNX0.nhM_fUiw99ZxzlEwZMS6kBJNXjNzGNpdfwo9x5mEgF0"
-);
-
-let uid=localStorage.getItem("uid");
-
-if(!uid){
-uid=crypto.randomUUID();
-localStorage.setItem("uid",uid);
-supabase.from("views").insert([{user_id:uid}]);
+/* player */
+playBtn.onclick=()=>{
+if(music.paused){
+music.play();
+playBtn.innerHTML="❚❚";
+}else{
+music.pause();
+playBtn.innerHTML="▶";
 }
-
-supabase.from("views")
-.select("*",{count:"exact",head:true})
-.then(r=>{
-views.innerText="👁 "+(r.count||0);
-});
-
-}catch(e){
-views.innerText="👁 error";
-}
+};
 
 </script>
 
