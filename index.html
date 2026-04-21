@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>AY3ENT FINAL</title>
+<title>AY3ENT ULTRA</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
 
@@ -28,14 +28,15 @@ transform:translate(-50%,-50%);
 }
 .cursor-glow{
 position:fixed;
-width:40px;
-height:40px;
+width:60px;
+height:60px;
 border-radius:50%;
-background:rgba(123,47,247,0.25);
-filter:blur(12px);
+background:radial-gradient(circle, rgba(123,47,247,0.4), transparent);
+filter:blur(15px);
 z-index:9998;
 pointer-events:none;
 transform:translate(-50%,-50%);
+transition:0.2s;
 }
 
 /* INTRO */
@@ -55,10 +56,11 @@ transition:opacity 1s;
 /* BG */
 .background{
 position:fixed;
-width:100%;
-height:100%;
+width:110%;
+height:110%;
 background:url('bg.gif') center/cover no-repeat;
 z-index:-2;
+transition:0.2s;
 }
 
 /* WRAPPER */
@@ -96,84 +98,42 @@ transition:1.5s;
 .btn img{width:50px;border-radius:10px;}
 .btn-text{color:white;opacity:0;transform:translateX(-10px);transition:0.3s;}
 .btn-row:hover .btn-text{opacity:1;transform:translateX(0);}
-.btn:hover{transform:scale(1.08);box-shadow:0 0 20px #7b2ff7;}
+.btn:hover{transform:scale(1.1);box-shadow:0 0 25px #7b2ff7;}
 
-/* PLAYER (SPOTIFY STYLE) */
-.player{
-position:absolute;
-bottom:80px;
-width:80%;
-}
-
-.player-top{
-display:flex;
-align-items:center;
-justify-content:center;
-gap:15px;
-}
+/* PLAYER */
+.player{position:absolute;bottom:80px;width:80%;}
+.player-top{display:flex;align-items:center;justify-content:center;gap:15px;}
 
 .play-btn{
-width:55px;
-height:55px;
-border-radius:50%;
-background:#7b2ff7;
-border:none;
-color:white;
-cursor:pointer;
-box-shadow:0 0 15px #7b2ff7;
+width:55px;height:55px;border-radius:50%;
+background:#7b2ff7;border:none;color:white;cursor:pointer;
+box-shadow:0 0 20px #7b2ff7;
 }
 
-.volume-wrap{
-display:flex;
-align-items:center;
-gap:8px;
-}
-
-.volume-icon{
-color:white;
-cursor:pointer;
-font-size:14px;
-opacity:0.8;
-}
-
+.volume-wrap{display:flex;align-items:center;gap:8px;}
+.volume-icon{color:white;cursor:pointer;}
 .volume-slider{
-width:70px;
-height:4px;
-appearance:none;
-background:rgba(255,255,255,0.2);
+width:70px;height:4px;
+appearance:none;background:rgba(255,255,255,0.2);
 border-radius:10px;
 }
-
 .volume-slider::-webkit-slider-thumb{
-appearance:none;
-width:10px;
-height:10px;
-background:#7b2ff7;
-border-radius:50%;
-box-shadow:0 0 8px #7b2ff7;
-cursor:pointer;
+appearance:none;width:10px;height:10px;
+background:#7b2ff7;border-radius:50%;
 }
 
 /* PROGRESS */
 .progress-container{
-width:100%;
-height:4px;
+width:100%;height:4px;
 background:rgba(255,255,255,0.2);
-margin-top:10px;
-cursor:pointer;
+margin-top:10px;cursor:pointer;
 }
-#progressBar{
-height:100%;
-width:0%;
-background:#7b2ff7;
-}
+#progressBar{height:100%;width:0%;background:#7b2ff7;}
 
 /* TIME */
 .time{
-display:flex;
-justify-content:space-between;
-font-size:11px;
-color:#aaa;
+display:flex;justify-content:space-between;
+font-size:11px;color:#aaa;
 }
 
 /* VIS */
@@ -182,6 +142,12 @@ position:absolute;
 bottom:0;
 width:100%;
 height:60px;
+}
+
+/* MOBILE */
+@media(max-width:600px){
+.wrapper{width:95vw;height:90vh;}
+.buttons{flex-direction:column;}
 }
 </style>
 </head>
@@ -192,10 +158,10 @@ height:60px;
 <div class="cursor-glow" id="cursorGlow"></div>
 
 <div class="intro" id="intro">
-<h1 style="color:white;">AY3ENT BIO</h1>
+<h1 style="color:white;">AY3ENT</h1>
 </div>
 
-<div class="background"></div>
+<div class="background" id="bg"></div>
 
 <div class="wrapper" id="main">
 
@@ -223,16 +189,12 @@ height:60px;
 </div>
 
 <div class="player">
-
 <div class="player-top">
-
 <button id="playBtn" class="play-btn">▶</button>
-
 <div class="volume-wrap">
-<span id="volumeIcon" class="volume-icon">🔊</span>
+<span id="volumeIcon">🔊</span>
 <input type="range" id="volume" class="volume-slider" min="0" max="1" step="0.01">
 </div>
-
 </div>
 
 <div class="progress-container" id="progressContainer">
@@ -243,7 +205,6 @@ height:60px;
 <span id="current">0:00</span>
 <span id="duration">0:00</span>
 </div>
-
 </div>
 
 <canvas id="audioVis"></canvas>
@@ -253,19 +214,23 @@ height:60px;
 <audio id="music" src="music.mp3"></audio>
 
 <script>
-const music = document.getElementById("music");
-const playBtn = document.getElementById("playBtn");
+const music=document.getElementById("music");
+const playBtn=document.getElementById("playBtn");
 
 /* CURSOR */
 const cur=document.getElementById("cursor");
 const glow=document.getElementById("cursorGlow");
-
 let x=0,y=0,fx=0,fy=0;
+
 document.onmousemove=e=>{
 x=e.clientX;y=e.clientY;
 cur.style.left=x+"px";
 cur.style.top=y+"px";
+
+/* parallax */
+bg.style.transform=`translate(${x/50}px,${y/50}px)`;
 };
+
 (function loop(){
 fx+=(x-fx)*0.15;
 fy+=(y-fy)*0.15;
@@ -285,11 +250,11 @@ setTimeout(t,100);
 })();
 
 /* AUDIO */
-const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-const analyser=audioCtx.createAnalyser();
-const src=audioCtx.createMediaElementSource(music);
+const ctx=new (window.AudioContext||window.webkitAudioContext)();
+const analyser=ctx.createAnalyser();
+const src=ctx.createMediaElementSource(music);
 src.connect(analyser);
-analyser.connect(audioCtx.destination);
+analyser.connect(ctx.destination);
 analyser.fftSize=128;
 const data=new Uint8Array(analyser.frequencyBinCount);
 
@@ -303,35 +268,22 @@ music.volume=volume.value;
 volume.oninput=()=>{
 music.volume=volume.value;
 localStorage.setItem("vol",volume.value);
-updateIcon();
+volumeIcon.textContent=music.volume==0?"🔇":"🔊";
 };
 
 volumeIcon.onclick=()=>{
-if(music.volume>0){
-music.volume=0;
-volume.value=0;
-}else{
-music.volume=0.5;
-volume.value=0.5;
-}
-updateIcon();
+music.volume=music.volume>0?0:0.5;
+volume.value=music.volume;
+volumeIcon.textContent=music.volume==0?"🔇":"🔊";
 };
 
-function updateIcon(){
-volumeIcon.textContent = music.volume==0 ? "🔇" : "🔊";
-}
-
 /* VIS */
-const c1=document.getElementById("audioVis");
-const ctx1=c1.getContext("2d");
-const c2=document.getElementById("circleVis");
-const ctx2=c2.getContext("2d");
+const c=document.getElementById("audioVis");
+const ctx2=c.getContext("2d");
 
 function resize(){
-c1.width=window.innerWidth;
-c1.height=60;
-c2.width=c2.offsetWidth;
-c2.height=c2.offsetHeight;
+c.width=window.innerWidth;
+c.height=60;
 }
 resize();
 window.onresize=resize;
@@ -340,42 +292,23 @@ function draw(){
 requestAnimationFrame(draw);
 analyser.getByteFrequencyData(data);
 
-/* bars */
-ctx1.clearRect(0,0,c1.width,c1.height);
-let w=c1.width/data.length;
+ctx2.clearRect(0,0,c.width,c.height);
+
+let bass=data[1]/255;
+main.style.transform=`translate(-50%,-50%) scale(${1+ bass*0.03})`;
+
+let w=c.width/data.length;
 for(let i=0;i<data.length;i++){
 let h=data[i]/2;
-ctx1.fillStyle="#7b2ff7";
-ctx1.fillRect(i*w,c1.height-h,w-2,h);
-}
-
-/* circle */
-ctx2.clearRect(0,0,c2.width,c2.height);
-let cx=c2.width/2;
-let cy=c2.height/2;
-let r=60;
-
-for(let i=0;i<data.length;i++){
-let a=(i/data.length)*Math.PI*2;
-let len=data[i]/3;
-let x1=cx+Math.cos(a)*r;
-let y1=cy+Math.sin(a)*r;
-let x2=cx+Math.cos(a)*(r+len);
-let y2=cy+Math.sin(a)*(r+len);
-ctx2.beginPath();
-ctx2.moveTo(x1,y1);
-ctx2.lineTo(x2,y2);
-ctx2.strokeStyle="#7b2ff7";
-ctx2.stroke();
+ctx2.fillStyle="#7b2ff7";
+ctx2.fillRect(i*w,c.height-h,w-2,h);
 }
 }
 
 /* PLAY */
 playBtn.onclick=()=>{
 if(music.paused){
-music.play();
-audioCtx.resume();
-draw();
+music.play();ctx.resume();draw();
 playBtn.innerHTML="❚❚";
 }else{
 music.pause();
@@ -396,10 +329,7 @@ intro.onclick=()=>{
 intro.style.opacity=0;
 main.style.opacity=1;
 setTimeout(()=>intro.remove(),1000);
-
-music.play();
-audioCtx.resume();
-draw();
+music.play();ctx.resume();draw();
 playBtn.innerHTML="❚❚";
 };
 
