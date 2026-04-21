@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>AY3ENT FINAL STABLE</title>
+<title>AY3ENT FINAL</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
 
@@ -18,8 +18,8 @@ cursor:none;
 /* CURSOR */
 .cursor{
 position:fixed;
-width:8px;
-height:8px;
+width:10px;
+height:10px;
 background:white;
 border-radius:50%;
 z-index:9999;
@@ -28,11 +28,11 @@ transform:translate(-50%,-50%);
 }
 .cursor-glow{
 position:fixed;
-width:30px;
-height:30px;
+width:40px;
+height:40px;
 border-radius:50%;
-background:rgba(123,47,247,0.2);
-filter:blur(8px);
+background:rgba(123,47,247,0.25);
+filter:blur(12px);
 z-index:9998;
 pointer-events:none;
 transform:translate(-50%,-50%);
@@ -55,8 +55,8 @@ transition:opacity 1s;
 /* BG */
 .background{
 position:fixed;
-width:105%;
-height:105%;
+width:100%;
+height:100%;
 background:url('bg.gif') center/cover no-repeat;
 z-index:-2;
 }
@@ -69,10 +69,10 @@ left:50%;
 transform:translate(-50%,-50%);
 width:80vw;
 height:80vh;
-border-radius:25px;
-background:rgba(20,20,20,0.35);
-backdrop-filter:blur(12px);
-box-shadow:0 0 30px rgba(123,47,247,0.25);
+border-radius:30px;
+background:rgba(20,20,20,0.45);
+backdrop-filter:blur(25px);
+box-shadow:0 0 60px rgba(123,47,247,0.35);
 display:flex;
 flex-direction:column;
 align-items:center;
@@ -82,113 +82,84 @@ transition:1.5s;
 }
 
 /* TEXT */
-.typing{
-color:#ddd;
-margin-bottom:10px;
-height:20px;
-}
+.typing{color:white;margin-bottom:10px;height:20px;}
 
 /* AVATAR */
-.avatar-wrap{
-position:relative;
-width:140px;
-height:140px;
-}
-.avatar{
-width:100%;
-height:100%;
-border-radius:50%;
-}
-#circleVis{
-position:absolute;
-width:100%;
-height:100%;
-}
+.avatar-wrap{position:relative;width:150px;height:150px;}
+.avatar{width:100%;height:100%;border-radius:50%;}
+#circleVis{position:absolute;width:100%;height:100%;}
 
 /* BUTTONS */
-.buttons{
-margin-top:20px;
-display:flex;
-flex-direction:column;
-gap:12px;
-}
-.btn-row{
-display:flex;
-align-items:center;
-gap:10px;
-}
-.btn{
-padding:8px;
-border-radius:14px;
-background:rgba(255,255,255,0.05);
-transition:0.25s;
-}
-.btn img{width:45px;border-radius:10px;}
-.btn-text{
-color:#ccc;
-opacity:0;
-transform:translateX(-10px);
-transition:0.3s;
-}
-.btn-row:hover .btn-text{
-opacity:1;
-transform:translateX(0);
-}
-.btn:hover{
-transform:scale(1.06);
-box-shadow:0 0 15px rgba(123,47,247,0.5);
-}
+.buttons{margin-top:20px;display:flex;flex-direction:column;gap:15px;}
+.btn-row{display:flex;align-items:center;gap:10px;}
+.btn{padding:10px;border-radius:16px;background:rgba(255,255,255,0.06);transition:0.25s;}
+.btn img{width:50px;border-radius:10px;}
+.btn-text{color:white;opacity:0;transform:translateX(-10px);transition:0.3s;}
+.btn-row:hover .btn-text{opacity:1;transform:translateX(0);}
+.btn:hover{transform:scale(1.08);box-shadow:0 0 20px #7b2ff7;}
 
-/* PLAYER */
+/* PLAYER (SPOTIFY STYLE) */
 .player{
 position:absolute;
-bottom:70px;
-width:75%;
+bottom:80px;
+width:80%;
 }
+
 .player-top{
 display:flex;
 align-items:center;
 justify-content:center;
-gap:12px;
+gap:15px;
 }
 
 .play-btn{
-width:50px;
-height:50px;
+width:55px;
+height:55px;
 border-radius:50%;
 background:#7b2ff7;
 border:none;
 color:white;
 cursor:pointer;
-box-shadow:0 0 12px rgba(123,47,247,0.6);
+box-shadow:0 0 15px #7b2ff7;
 }
 
-/* VOLUME */
 .volume-wrap{
 display:flex;
 align-items:center;
-gap:6px;
+gap:8px;
 }
+
+.volume-icon{
+color:white;
+cursor:pointer;
+font-size:14px;
+opacity:0.8;
+}
+
 .volume-slider{
-width:60px;
-height:3px;
+width:70px;
+height:4px;
 appearance:none;
 background:rgba(255,255,255,0.2);
+border-radius:10px;
 }
+
 .volume-slider::-webkit-slider-thumb{
 appearance:none;
-width:9px;
-height:9px;
+width:10px;
+height:10px;
 background:#7b2ff7;
 border-radius:50%;
+box-shadow:0 0 8px #7b2ff7;
+cursor:pointer;
 }
 
 /* PROGRESS */
 .progress-container{
 width:100%;
-height:3px;
+height:4px;
 background:rgba(255,255,255,0.2);
-margin-top:8px;
+margin-top:10px;
 cursor:pointer;
 }
 #progressBar{
@@ -201,8 +172,8 @@ background:#7b2ff7;
 .time{
 display:flex;
 justify-content:space-between;
-font-size:10px;
-color:#888;
+font-size:11px;
+color:#aaa;
 }
 
 /* VIS */
@@ -210,7 +181,7 @@ color:#888;
 position:absolute;
 bottom:0;
 width:100%;
-height:50px;
+height:60px;
 }
 </style>
 </head>
@@ -221,7 +192,7 @@ height:50px;
 <div class="cursor-glow" id="cursorGlow"></div>
 
 <div class="intro" id="intro">
-<h1 style="color:white;">AY3ENT</h1>
+<h1 style="color:white;">AY3ENT BIO</h1>
 </div>
 
 <div class="background"></div>
@@ -252,10 +223,13 @@ height:50px;
 </div>
 
 <div class="player">
+
 <div class="player-top">
+
 <button id="playBtn" class="play-btn">▶</button>
 
 <div class="volume-wrap">
+<span id="volumeIcon" class="volume-icon">🔊</span>
 <input type="range" id="volume" class="volume-slider" min="0" max="1" step="0.01">
 </div>
 
@@ -269,6 +243,7 @@ height:50px;
 <span id="current">0:00</span>
 <span id="duration">0:00</span>
 </div>
+
 </div>
 
 <canvas id="audioVis"></canvas>
@@ -278,21 +253,19 @@ height:50px;
 <audio id="music" src="music.mp3"></audio>
 
 <script>
-const music=document.getElementById("music");
-const playBtn=document.getElementById("playBtn");
+const music = document.getElementById("music");
+const playBtn = document.getElementById("playBtn");
 
 /* CURSOR */
 const cur=document.getElementById("cursor");
 const glow=document.getElementById("cursorGlow");
 
 let x=0,y=0,fx=0,fy=0;
-
 document.onmousemove=e=>{
 x=e.clientX;y=e.clientY;
 cur.style.left=x+"px";
 cur.style.top=y+"px";
 };
-
 (function loop(){
 fx+=(x-fx)*0.15;
 fy+=(y-fy)*0.15;
@@ -301,23 +274,64 @@ glow.style.top=fy+"px";
 requestAnimationFrame(loop);
 })();
 
-/* AUDIO */
-const ctx=new (window.AudioContext||window.webkitAudioContext)();
-const analyser=ctx.createAnalyser();
-const src=ctx.createMediaElementSource(music);
-src.connect(analyser);
-analyser.connect(ctx.destination);
-analyser.fftSize=64;
+/* TYPING */
+let words=["ay3ent","streamer","developer"];
+let i=0,j=0;
+(function t(){
+typing.innerHTML=words[i].slice(0,j)+"|";
+j++;
+if(j>words[i].length+3){j=0;i=(i+1)%words.length;}
+setTimeout(t,100);
+})();
 
+/* AUDIO */
+const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+const analyser=audioCtx.createAnalyser();
+const src=audioCtx.createMediaElementSource(music);
+src.connect(analyser);
+analyser.connect(audioCtx.destination);
+analyser.fftSize=128;
 const data=new Uint8Array(analyser.frequencyBinCount);
 
+/* VOLUME */
+const volume=document.getElementById("volume");
+const volumeIcon=document.getElementById("volumeIcon");
+
+volume.value=localStorage.getItem("vol")||0.5;
+music.volume=volume.value;
+
+volume.oninput=()=>{
+music.volume=volume.value;
+localStorage.setItem("vol",volume.value);
+updateIcon();
+};
+
+volumeIcon.onclick=()=>{
+if(music.volume>0){
+music.volume=0;
+volume.value=0;
+}else{
+music.volume=0.5;
+volume.value=0.5;
+}
+updateIcon();
+};
+
+function updateIcon(){
+volumeIcon.textContent = music.volume==0 ? "🔇" : "🔊";
+}
+
 /* VIS */
-const c=document.getElementById("audioVis");
-const ctx2=c.getContext("2d");
+const c1=document.getElementById("audioVis");
+const ctx1=c1.getContext("2d");
+const c2=document.getElementById("circleVis");
+const ctx2=c2.getContext("2d");
 
 function resize(){
-c.width=window.innerWidth;
-c.height=50;
+c1.width=window.innerWidth;
+c1.height=60;
+c2.width=c2.offsetWidth;
+c2.height=c2.offsetHeight;
 }
 resize();
 window.onresize=resize;
@@ -326,13 +340,33 @@ function draw(){
 requestAnimationFrame(draw);
 analyser.getByteFrequencyData(data);
 
-ctx2.clearRect(0,0,c.width,c.height);
-
-let w=c.width/data.length;
+/* bars */
+ctx1.clearRect(0,0,c1.width,c1.height);
+let w=c1.width/data.length;
 for(let i=0;i<data.length;i++){
 let h=data[i]/2;
-ctx2.fillStyle="rgba(123,47,247,0.7)";
-ctx2.fillRect(i*w,c.height-h,w-2,h);
+ctx1.fillStyle="#7b2ff7";
+ctx1.fillRect(i*w,c1.height-h,w-2,h);
+}
+
+/* circle */
+ctx2.clearRect(0,0,c2.width,c2.height);
+let cx=c2.width/2;
+let cy=c2.height/2;
+let r=60;
+
+for(let i=0;i<data.length;i++){
+let a=(i/data.length)*Math.PI*2;
+let len=data[i]/3;
+let x1=cx+Math.cos(a)*r;
+let y1=cy+Math.sin(a)*r;
+let x2=cx+Math.cos(a)*(r+len);
+let y2=cy+Math.sin(a)*(r+len);
+ctx2.beginPath();
+ctx2.moveTo(x1,y1);
+ctx2.lineTo(x2,y2);
+ctx2.strokeStyle="#7b2ff7";
+ctx2.stroke();
 }
 }
 
@@ -340,7 +374,7 @@ ctx2.fillRect(i*w,c.height-h,w-2,h);
 playBtn.onclick=()=>{
 if(music.paused){
 music.play();
-ctx.resume();
+audioCtx.resume();
 draw();
 playBtn.innerHTML="❚❚";
 }else{
@@ -364,7 +398,7 @@ main.style.opacity=1;
 setTimeout(()=>intro.remove(),1000);
 
 music.play();
-ctx.resume();
+audioCtx.resume();
 draw();
 playBtn.innerHTML="❚❚";
 };
