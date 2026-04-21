@@ -46,6 +46,14 @@ body {
     width: 110%;
     height: 110%;
     background: url('bg.gif') center/cover no-repeat;
+    z-index: -2;
+}
+
+/* PARTICLES */
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
     z-index: -1;
 }
 
@@ -71,33 +79,52 @@ body {
 .typing {
     color: white;
     margin-bottom: 20px;
-    height: 20px;
 }
 
 /* BUTTONS */
 .buttons {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 18px;
 }
 
 .btn-row {
     display: flex;
     align-items: center;
+    gap: 12px;
+}
+
+/* КНОПКА */
+.btn {
+    display: flex;
+    align-items: center;
     gap: 10px;
+
+    padding: 10px 16px;
+    border-radius: 25px;
+
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+
+    border: 1px solid rgba(123,47,247,0.3);
+
+    transition: 0.25s;
 }
 
+/* PNG */
 .btn img {
-    width: 85px;
-    border-radius: 20px;
-    transition: 0.2s;
+    width: 60px;
+    border-radius: 15px;
 }
 
-.btn img:hover {
-    transform: scale(1.1);
+/* HOVER */
+.btn:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 0 20px rgba(123,47,247,0.6);
+    background: linear-gradient(45deg, rgba(123,47,247,0.2), rgba(30,60,114,0.2));
 }
 
-/* TEXT ON HOVER */
+/* TEXT */
 .btn-text {
     color: white;
     opacity: 0;
@@ -108,7 +135,7 @@ body {
     opacity: 1;
 }
 
-/* 🎧 PLAYER */
+/* PLAYER */
 .player {
     position: fixed;
     bottom: 20px;
@@ -125,7 +152,6 @@ body {
 .controls {
     display: flex;
     justify-content: center;
-    margin-bottom: 6px;
 }
 
 .play-btn {
@@ -134,24 +160,12 @@ body {
     border-radius: 50%;
     border: none;
     background: white;
-    color: black;
-    font-size: 16px;
     cursor: pointer;
 }
 
 .progress {
     width: 100%;
-    appearance: none;
-    height: 4px;
-    background: #555;
-}
-
-.progress::-webkit-slider-thumb {
-    appearance: none;
-    width: 10px;
-    height: 10px;
-    background: white;
-    border-radius: 50%;
+    margin-top: 6px;
 }
 
 .bottom {
@@ -167,24 +181,12 @@ body {
 
 .volume {
     width: 70px;
-    appearance: none;
-    height: 4px;
-    background: #777;
-}
-
-.volume::-webkit-slider-thumb {
-    appearance: none;
-    width: 10px;
-    height: 10px;
-    background: white;
-    border-radius: 50%;
 }
 
 /* MOBILE */
 @media(max-width:600px){
     .avatar {width:100px;height:100px;}
-    .btn img {width:65px;}
-    .player {width:260px;}
+    .btn img {width:50px;}
 }
 </style>
 </head>
@@ -198,6 +200,7 @@ body {
 <div class="main" id="main">
 
 <div class="background"></div>
+<canvas id="particles"></canvas>
 
 <div class="container">
 
@@ -225,23 +228,18 @@ body {
 
 </div>
 
-<!-- PLAYER -->
 <div class="player">
-
 <div class="controls">
 <button id="playBtn" class="play-btn">▶</button>
 </div>
 
-<input type="range" id="progress" class="progress" value="0">
+<input type="range" id="progress" class="progress">
 
 <div class="bottom">
 <span id="currentTime" class="time">0:00</span>
-
-<input type="range" id="volume" class="volume" min="0" max="1" step="0.01" value="0.5">
-
+<input type="range" id="volume" class="volume" min="0" max="1" step="0.01">
 <span id="duration" class="time">0:00</span>
 </div>
-
 </div>
 
 <audio id="music" src="music.mp3"></audio>
@@ -249,13 +247,6 @@ body {
 </div>
 
 <script>
-let music = document.getElementById("music");
-let playBtn = document.getElementById("playBtn");
-let progress = document.getElementById("progress");
-let volume = document.getElementById("volume");
-let currentTime = document.getElementById("currentTime");
-let duration = document.getElementById("duration");
-
 /* ENTER */
 function enterSite(){
 document.querySelector(".intro").style.opacity="0";
@@ -264,8 +255,45 @@ setTimeout(()=>document.querySelector(".intro").remove(),1000);
 music.play();
 }
 
-/* PLAY */
-playBtn.onclick = ()=>{
+/* PARTICLES */
+let canvas = document.getElementById("particles");
+let ctx = canvas.getContext("2d");
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let particles = [];
+for(let i=0;i<40;i++){
+particles.push({
+x: Math.random()*canvas.width,
+y: Math.random()*canvas.height,
+vx: (Math.random()-0.5)*0.4,
+vy: (Math.random()-0.5)*0.4
+});
+}
+
+function draw(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+particles.forEach(p=>{
+p.x+=p.vx;
+p.y+=p.vy;
+ctx.beginPath();
+ctx.arc(p.x,p.y,1.5,0,Math.PI*2);
+ctx.fillStyle="rgba(123,47,247,0.5)";
+ctx.fill();
+});
+requestAnimationFrame(draw);
+}
+draw();
+
+/* AUDIO */
+let music = document.getElementById("music");
+let playBtn = document.getElementById("playBtn");
+let progress = document.getElementById("progress");
+let volume = document.getElementById("volume");
+let currentTime = document.getElementById("currentTime");
+let duration = document.getElementById("duration");
+
+playBtn.onclick=()=>{
 if(music.paused){
 music.play();
 playBtn.innerHTML="❚❚";
@@ -275,52 +303,37 @@ playBtn.innerHTML="▶";
 }
 };
 
-/* TIME */
 music.addEventListener("loadedmetadata", ()=>{
 duration.innerText = formatTime(music.duration);
 });
 
 music.addEventListener("timeupdate", ()=>{
-progress.value = (music.currentTime / music.duration)*100;
+progress.value = (music.currentTime/music.duration)*100;
 currentTime.innerText = formatTime(music.currentTime);
 });
 
-/* SEEK */
-progress.addEventListener("input", ()=>{
-music.currentTime = (progress.value/100)*music.duration;
-});
+progress.oninput=()=>music.currentTime=(progress.value/100)*music.duration;
+volume.oninput=()=>music.volume=volume.value;
 
-/* VOLUME */
-volume.addEventListener("input", ()=>{
-music.volume = volume.value;
-});
-
-/* FORMAT TIME */
 function formatTime(sec){
-let m = Math.floor(sec/60);
-let s = Math.floor(sec%60);
+let m=Math.floor(sec/60);
+let s=Math.floor(sec%60);
 if(s<10)s="0"+s;
 return m+":"+s;
 }
 
-/* ⚡ TYPING (БЫСТРЕЕ) */
-let words = ["ay3ent...", "streamer...", "developer..."];
-let i=0, j=0;
+/* TYPING */
+let words=["ay3ent...","streamer...","developer..."];
+let i=0,j=0;
 
 function type(){
-document.getElementById("typing").innerText = words[i].slice(0,j);
+document.getElementById("typing").innerText=words[i].slice(0,j);
 j++;
-
-if(j > words[i].length){
-setTimeout(()=>{
-j=0;
-i = (i+1)%words.length;
-}, 1000);
+if(j>words[i].length){
+setTimeout(()=>{j=0;i=(i+1)%words.length},1000);
 }
-
-setTimeout(type, 180); // быстрее (было 240)
+setTimeout(type,180);
 }
-
 type();
 </script>
 
