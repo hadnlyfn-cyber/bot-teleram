@@ -28,18 +28,20 @@ body {
     transition: 1s;
 }
 
+/* MAIN */
 .main {
     opacity: 0;
     transition: 1.5s;
 }
 
-/* BG */
+/* PARALLAX BG */
 .background {
     position: fixed;
-    width: 110%;
-    height: 110%;
+    width: 120%;
+    height: 120%;
     background: url('bg.gif') center/cover no-repeat;
     z-index: -2;
+    transition: transform 0.1s;
 }
 
 /* PARTICLES */
@@ -63,7 +65,11 @@ canvas {
     height: 140px;
     border-radius: 50%;
     object-fit: cover;
-    box-shadow: 0 0 25px #7b2ff7;
+    box-shadow: 0 0 30px #7b2ff7;
+    transition: 0.3s;
+}
+.avatar:hover {
+    transform: scale(1.05);
 }
 
 /* VIEWS */
@@ -85,34 +91,27 @@ canvas {
     gap: 18px;
 }
 
-.btn-row {
+.btn {
+    padding: 12px 20px;
+    border-radius: 25px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(123,47,247,0.3);
     display: flex;
     align-items: center;
     gap: 10px;
-}
-
-.btn {
-    padding: 10px;
-    border-radius: 20px;
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(10px);
-    transition: 0.2s;
+    transition: 0.25s;
     transform-style: preserve-3d;
 }
 
 .btn img {
-    width: 60px;
+    width: 55px;
     border-radius: 12px;
 }
 
-.btn-text {
-    color: white;
-    opacity: 0;
-    transition: 0.3s;
-}
-
-.btn-row:hover .btn-text {
-    opacity: 1;
+.btn:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 0 25px rgba(123,47,247,0.6);
 }
 
 /* PLAYER */
@@ -122,37 +121,14 @@ canvas {
     left: 50%;
     transform: translateX(-50%);
     width: 300px;
-    padding: 12px;
-    border-radius: 20px;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 20px rgba(123,47,247,0.5);
 }
 
-.play-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: none;
-    background: white;
-    cursor: pointer;
-}
-
-.progress {
+canvas#visualizer {
     width: 100%;
-    height: 4px;
+    height: 60px;
 }
 
-.volume {
-    width: 70px;
-}
-
-.bottom {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 5px;
-}
-
+/* TIME */
 .time {
     color: #aaa;
     font-size: 10px;
@@ -168,7 +144,7 @@ canvas {
 
 <div class="main" id="main">
 
-<div class="background"></div>
+<div class="background" id="bg"></div>
 <canvas id="particles"></canvas>
 
 <div class="container">
@@ -180,40 +156,19 @@ canvas {
 <div class="typing" id="typing"></div>
 
 <div class="buttons">
-
-<div class="btn-row">
 <a href="https://twitch.tv/ay3ent" class="btn tilt">
-<img src="twitch2.png">
+<img src="twitch2.png"> twitch
 </a>
-<span class="btn-text">twitch</span>
-</div>
 
-<div class="btn-row">
 <a href="https://t.me/ay3ent" class="btn tilt">
-<img src="telegram.png">
+<img src="telegram.png"> telegram
 </a>
-<span class="btn-text">telegram</span>
 </div>
 
 </div>
 
-</div>
-
-<!-- PLAYER -->
 <div class="player">
-
-<div style="text-align:center;">
-<button id="playBtn" class="play-btn">▶</button>
-</div>
-
-<input type="range" id="progress" class="progress" value="0">
-
-<div class="bottom">
-<span id="currentTime" class="time">0:00</span>
-<input type="range" id="volume" class="volume" min="0" max="1" step="0.01" value="0.5">
-<span id="duration" class="time">0:00</span>
-</div>
-
+<canvas id="visualizer"></canvas>
 </div>
 
 <audio id="music" src="music.mp3"></audio>
@@ -239,100 +194,89 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const viewRef = ref(db, "views");
 
-get(viewRef).then((snapshot) => {
-  let count = snapshot.exists() ? snapshot.val() : 0;
-  set(viewRef, count + 1);
+get(viewRef).then(s=>{
+let c=s.exists()?s.val():0;
+set(viewRef,c+1);
 });
 
-onValue(viewRef, (snapshot) => {
-  document.getElementById("views").innerText = "👁 " + snapshot.val();
+onValue(viewRef, s=>{
+document.getElementById("views").innerText="👁 "+s.val();
 });
 </script>
 
 <script>
+let music = document.getElementById("music");
+
+/* ENTER */
 function enterSite(){
 document.querySelector(".intro").style.opacity="0";
 document.getElementById("main").style.opacity="1";
 setTimeout(()=>document.querySelector(".intro").remove(),1000);
-
-/* запускаем музыку после клика */
-music.play().catch(()=>{});
+music.play();
+initAudio();
 }
 
-/* PARTICLES */
-let canvas = document.getElementById("particles");
-let ctx = canvas.getContext("2d");
-canvas.width = innerWidth;
-canvas.height = innerHeight;
+/* PARALLAX */
+document.addEventListener("mousemove", e=>{
+let x=(e.clientX/window.innerWidth-0.5)*20;
+let y=(e.clientY/window.innerHeight-0.5)*20;
+document.getElementById("bg").style.transform=`translate(${x}px,${y}px)`;
+});
 
-let particles=[];
+/* PARTICLES */
+let canvas=document.getElementById("particles");
+let ctx=canvas.getContext("2d");
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+
+let p=[];
 for(let i=0;i<40;i++){
-particles.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-0.5)*0.5,vy:(Math.random()-0.5)*0.5});
+p.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3});
 }
 
 function draw(){
 ctx.clearRect(0,0,canvas.width,canvas.height);
-particles.forEach(p=>{
-p.x+=p.vx;
-p.y+=p.vy;
+p.forEach(a=>{
+a.x+=a.vx;a.y+=a.vy;
 ctx.beginPath();
-ctx.arc(p.x,p.y,1.5,0,Math.PI*2);
-ctx.fillStyle="rgba(123,47,247,0.5)";
+ctx.arc(a.x,a.y,1.2,0,Math.PI*2);
+ctx.fillStyle="rgba(123,47,247,0.4)";
 ctx.fill();
 });
 requestAnimationFrame(draw);
 }
 draw();
 
-/* 3D TILT */
-document.querySelectorAll(".tilt").forEach(el=>{
-el.addEventListener("mousemove", e=>{
-let r=el.getBoundingClientRect();
-let x=e.clientX-r.left;
-let y=e.clientY-r.top;
-el.style.transform=`rotateX(${-(y/r.height-0.5)*20}deg) rotateY(${(x/r.width-0.5)*20}deg)`;
-});
-el.addEventListener("mouseleave",()=>el.style.transform="rotateX(0) rotateY(0)");
-});
+/* VISUALIZER */
+function initAudio(){
+const ctxAudio=new AudioContext();
+const src=ctxAudio.createMediaElementSource(music);
+const analyser=ctxAudio.createAnalyser();
 
-/* AUDIO */
-let music = document.getElementById("music");
-let playBtn = document.getElementById("playBtn");
-let progress = document.getElementById("progress");
-let volume = document.getElementById("volume");
-let currentTime = document.getElementById("currentTime");
-let duration = document.getElementById("duration");
+src.connect(analyser);
+analyser.connect(ctxAudio.destination);
 
-playBtn.onclick = ()=>{
-if(music.paused){
-music.play();
-playBtn.innerHTML="❚❚";
-}else{
-music.pause();
-playBtn.innerHTML="▶";
+analyser.fftSize=64;
+const bufferLength=analyser.frequencyBinCount;
+const dataArray=new Uint8Array(bufferLength);
+
+const canvas=document.getElementById("visualizer");
+const ctx=canvas.getContext("2d");
+
+function render(){
+requestAnimationFrame(render);
+analyser.getByteFrequencyData(dataArray);
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+let barWidth=canvas.width/bufferLength;
+
+for(let i=0;i<bufferLength;i++){
+let h=dataArray[i];
+ctx.fillStyle="rgba(123,47,247,0.8)";
+ctx.fillRect(i*barWidth,canvas.height-h/2,barWidth-2,h/2);
 }
-};
-
-music.addEventListener("loadedmetadata", ()=>{
-duration.innerText = formatTime(music.duration);
-});
-
-music.addEventListener("timeupdate", ()=>{
-progress.value = (music.currentTime / music.duration)*100;
-currentTime.innerText = formatTime(music.currentTime);
-});
-
-progress.oninput = ()=>{
-music.currentTime = (progress.value/100)*music.duration;
-};
-
-volume.oninput = ()=> music.volume = volume.value;
-
-function formatTime(sec){
-let m=Math.floor(sec/60);
-let s=Math.floor(sec%60);
-if(s<10)s="0"+s;
-return m+":"+s;
+}
+render();
 }
 
 /* TYPING */
@@ -344,6 +288,17 @@ if(j>words[i].length){j=0;i=(i+1)%words.length;}
 setTimeout(type,180);
 }
 type();
+
+/* TILT */
+document.querySelectorAll(".tilt").forEach(el=>{
+el.addEventListener("mousemove",e=>{
+let r=el.getBoundingClientRect();
+let x=e.clientX-r.left;
+let y=e.clientY-r.top;
+el.style.transform=`rotateX(${-(y/r.height-0.5)*15}deg) rotateY(${(x/r.width-0.5)*15}deg)`;
+});
+el.addEventListener("mouseleave",()=>el.style.transform="rotateX(0) rotateY(0)");
+});
 </script>
 
 </body>
