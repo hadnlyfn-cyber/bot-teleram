@@ -16,14 +16,14 @@ body {
 
 /* КУРСОР */
 .cursor {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border: 2px solid #7b2ff7;
     border-radius: 50%;
     position: fixed;
     pointer-events: none;
     transform: translate(-50%, -50%);
-    box-shadow: 0 0 15px #7b2ff7;
+    box-shadow: 0 0 20px #7b2ff7;
 }
 
 /* INTRO */
@@ -43,28 +43,20 @@ body {
 .intro-text {
     color: white;
     font-size: 42px;
-    text-shadow: 0 0 25px #7b2ff7;
+    text-shadow: 0 0 30px #7b2ff7;
 }
 
 /* MAIN */
 .main {
     opacity: 0;
-    transition: 1.5s;
+    transition: 1.5s ease;
 }
 
-/* PARTICLES */
-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: -3;
-}
-
-/* BG */
+/* BACKGROUND */
 .background {
     position: fixed;
-    width: 110%;
-    height: 110%;
+    width: 120%;
+    height: 120%;
     background: url('bg.gif') center/cover no-repeat;
     z-index: -2;
 }
@@ -78,24 +70,12 @@ canvas {
     justify-content: center;
 }
 
-/* AVATAR (КРУТИТСЯ) */
+/* AVATAR */
 .avatar {
     width: 140px;
     height: 140px;
     border-radius: 50%;
-    box-shadow: 0 0 25px #7b2ff7;
-    margin-bottom: 20px;
-    animation: spin 6s linear infinite;
-}
-
-@keyframes spin {
-    from {transform: rotate(0);}
-    to {transform: rotate(360deg);}
-}
-
-/* TEXT */
-.typing {
-    color: white;
+    box-shadow: 0 0 30px #7b2ff7;
     margin-bottom: 20px;
 }
 
@@ -113,8 +93,14 @@ canvas {
 }
 
 .btn-img {
-    width: 90px;
+    width: 85px;
     border-radius: 20px;
+    transition: 0.2s;
+}
+
+.btn-img:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 10px #7b2ff7);
 }
 
 .btn-text {
@@ -127,25 +113,69 @@ canvas {
     opacity: 1;
 }
 
-/* MOBILE */
-@media(max-width:600px){
-    .avatar {width: 100px;height:100px;}
-    .btn-img {width:70px;}
-}
-
-/* VISUALIZER */
-.visualizer {
+/* 🎧 AUDIO PLAYER */
+.player {
     position: fixed;
-    bottom: 100px;
+    bottom: 25px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 3px;
+    align-items: center;
+    gap: 15px;
+
+    padding: 12px 18px;
+    border-radius: 25px;
+
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(15px);
+
+    box-shadow: 0 0 20px rgba(123,47,247,0.4);
 }
 
-.bar {
-    width: 3px;
+/* play button */
+.play-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+
+    background: linear-gradient(45deg,#7b2ff7,#1e3c72);
+    color: white;
+    font-size: 16px;
+
+    box-shadow: 0 0 10px #7b2ff7;
+    transition: 0.2s;
+}
+
+.play-btn:hover {
+    transform: scale(1.1);
+}
+
+/* volume */
+.volume {
+    appearance: none;
+    width: 120px;
+    height: 6px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.2);
+    outline: none;
+}
+
+.volume::-webkit-slider-thumb {
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
     background: #7b2ff7;
+    box-shadow: 0 0 10px #7b2ff7;
+    cursor: pointer;
+}
+
+/* MOBILE */
+@media(max-width:600px){
+    .avatar {width:100px;height:100px;}
+    .btn-img {width:65px;}
 }
 </style>
 </head>
@@ -160,15 +190,11 @@ canvas {
 
 <div class="main" id="main">
 
-<canvas id="canvas"></canvas>
-
 <div class="background"></div>
 
 <div class="container">
 
 <img src="photo.jpg" class="avatar">
-
-<div class="typing" id="typing"></div>
 
 <div class="buttons">
 <div class="btn-row">
@@ -184,7 +210,11 @@ canvas {
 
 </div>
 
-<div class="visualizer" id="visualizer"></div>
+<!-- 🎧 PLAYER -->
+<div class="player">
+<button class="play-btn" id="playBtn">▶</button>
+<input type="range" min="0" max="1" step="0.01" value="0.5" id="volume" class="volume">
+</div>
 
 <audio id="music" loop src="music.mp3"></audio>
 <audio id="clickSound" src="click.mp3"></audio>
@@ -194,90 +224,42 @@ canvas {
 <script>
 let music = document.getElementById("music");
 let clickSound = document.getElementById("clickSound");
+let playBtn = document.getElementById("playBtn");
+let volume = document.getElementById("volume");
 
 /* ENTER */
 function enterSite(){
 document.querySelector(".intro").style.opacity="0";
 document.getElementById("main").style.opacity="1";
-setTimeout(()=>{document.querySelector(".intro").remove()},1000);
+
+setTimeout(()=>document.querySelector(".intro").remove(),1000);
 
 clickSound.play();
 music.play();
 }
 
-/* КУРСОР */
+/* PLAY / PAUSE */
+playBtn.onclick = () => {
+if(music.paused){
+music.play();
+playBtn.innerHTML = "❚❚";
+}else{
+music.pause();
+playBtn.innerHTML = "▶";
+}
+};
+
+/* VOLUME */
+volume.addEventListener("input", ()=>{
+music.volume = volume.value;
+});
+
+/* CURSOR */
 let cursor = document.getElementById("cursor");
 document.addEventListener("mousemove", e=>{
 cursor.style.left = e.clientX+"px";
 cursor.style.top = e.clientY+"px";
 });
-
-/* TYPING */
-let text = ["ay3ent...", "streamer...", "dev..."];
-let i=0,j=0;
-
-function type(){
-document.getElementById("typing").innerText = text[i].slice(0,j++);
-if(j>text[i].length){
-j=0;i=(i+1)%text.length;
-}
-setTimeout(type,120);
-}
-type();
-
-/* PARTICLES + LINES */
-let canvas = document.getElementById("canvas");
-let ctx = canvas.getContext("2d");
-canvas.width=innerWidth;
-canvas.height=innerHeight;
-
-let particles=[];
-for(let i=0;i<70;i++){
-particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:1-2*Math.random(),vy:1-2*Math.random()});
-}
-
-function draw(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
-
-particles.forEach(p=>{
-p.x+=p.vx;p.y+=p.vy;
-
-ctx.beginPath();
-ctx.arc(p.x,p.y,2,0,Math.PI*2);
-ctx.fillStyle="#7b2ff7";
-ctx.fill();
-
-particles.forEach(p2=>{
-let dx=p.x-p2.x;
-let dy=p.y-p2.y;
-let dist=Math.sqrt(dx*dx+dy*dy);
-if(dist<100){
-ctx.strokeStyle="rgba(123,47,247,0.2)";
-ctx.beginPath();
-ctx.moveTo(p.x,p.y);
-ctx.lineTo(p2.x,p2.y);
-ctx.stroke();
-}
-});
-});
-
-requestAnimationFrame(draw);
-}
-draw();
-
-/* VISUALIZER */
-let vis = document.getElementById("visualizer");
-for(let i=0;i<30;i++){
-let b=document.createElement("div");
-b.className="bar";
-vis.appendChild(b);
-}
-
-setInterval(()=>{
-document.querySelectorAll(".bar").forEach(b=>{
-b.style.height = (Math.random()*50)+"px";
-});
-},100);
 </script>
 
 </body>
