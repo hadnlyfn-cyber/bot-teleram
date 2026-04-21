@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>AY3ENT</title>
+<title>AY3ENT FINAL</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
 
@@ -12,6 +12,20 @@ margin:0;
 overflow:hidden;
 background:black;
 font-family:"Bungee",sans-serif;
+cursor:none;
+}
+
+/* CURSOR */
+.cursor{
+position:fixed;
+width:18px;
+height:18px;
+border-radius:50%;
+background:#7b2ff7;
+pointer-events:none;
+transform:translate(-50%,-50%);
+box-shadow:0 0 20px #7b2ff7;
+transition:0.08s;
 }
 
 /* INTRO */
@@ -25,7 +39,7 @@ justify-content:center;
 align-items:center;
 cursor:pointer;
 z-index:999;
-transition:opacity 1s ease;
+transition:opacity 1s;
 }
 
 /* BG */
@@ -45,48 +59,51 @@ left:50%;
 transform:translate(-50%,-50%);
 width:80vw;
 height:80vh;
-
 border-radius:30px;
-background:rgba(20,20,20,0.4);
+background:rgba(20,20,20,0.45);
 backdrop-filter:blur(25px);
-
-box-shadow:
-0 0 60px rgba(123,47,247,0.3),
-inset 0 0 40px rgba(123,47,247,0.1);
-
+box-shadow:0 0 60px rgba(123,47,247,0.35);
 display:flex;
 flex-direction:column;
 align-items:center;
 justify-content:center;
-
 opacity:0;
-transition:opacity 1.5s ease;
+transition:1.5s;
 }
 
 /* TEXT */
 .typing{
 color:white;
-font-size:14px;
-margin-bottom:15px;
+margin-bottom:10px;
 height:20px;
 }
 
-/* AVATAR */
-.avatar{
-width:130px;
-height:130px;
-border-radius:50%;
-box-shadow:0 0 25px #7b2ff7;
+/* AVATAR + VIS */
+.avatar-wrap{
+position:relative;
+width:150px;
+height:150px;
 }
 
-/* VIEWS */
-.views{
-color:#aaa;
-margin:10px 0;
+.avatar{
+width:100%;
+height:100%;
+border-radius:50%;
+z-index:2;
+position:relative;
+}
+
+#circleVis{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
 }
 
 /* BUTTONS */
 .buttons{
+margin-top:20px;
 display:flex;
 flex-direction:column;
 gap:15px;
@@ -99,11 +116,13 @@ gap:10px;
 }
 
 .btn{
+display:inline-flex;
 padding:10px;
 border-radius:16px;
 background:rgba(255,255,255,0.06);
 backdrop-filter:blur(10px);
 transition:0.25s;
+text-decoration:none;
 }
 
 .btn img{
@@ -124,7 +143,7 @@ transform:translateX(0);
 }
 
 .btn:hover{
-transform:translateY(-4px) scale(1.06);
+transform:scale(1.07);
 box-shadow:0 0 20px #7b2ff7;
 }
 
@@ -153,7 +172,7 @@ cursor:pointer;
 width:100%;
 height:4px;
 background:rgba(255,255,255,0.2);
-margin-top:12px;
+margin-top:10px;
 cursor:pointer;
 }
 
@@ -161,18 +180,6 @@ cursor:pointer;
 height:100%;
 width:0%;
 background:#7b2ff7;
-}
-
-/* VISUALIZER */
-.visualizer{
-width:100%;
-height:60px;
-margin-top:10px;
-}
-
-#audioVisualizer{
-width:100%;
-height:100%;
 }
 
 /* TIME */
@@ -187,6 +194,8 @@ color:#aaa;
 
 <body>
 
+<div class="cursor" id="cursor"></div>
+
 <div class="intro" id="intro">
 <h1 style="color:white;">AY3ENT BIO</h1>
 </div>
@@ -195,22 +204,26 @@ color:#aaa;
 
 <div class="wrapper" id="main">
 
-<!-- 🔥 ТЕКСТ НАД АВАТАРКОЙ -->
 <div id="typing" class="typing"></div>
 
+<div class="avatar-wrap">
+<canvas id="circleVis"></canvas>
 <img src="photo.jpg" class="avatar">
-
-<div id="views" class="views">👁 0</div>
+</div>
 
 <div class="buttons">
 
 <div class="btn-row">
-<a href="#" class="btn tilt"><img src="twitch2.png"></a>
+<a href="https://twitch.tv/ay3ent" target="_blank" class="btn">
+<img src="twitch2.png">
+</a>
 <span class="btn-text">twitch</span>
 </div>
 
 <div class="btn-row">
-<a href="#" class="btn tilt"><img src="telegram.png"></a>
+<a href="https://t.me/ay3ent" target="_blank" class="btn">
+<img src="telegram.png">
+</a>
 <span class="btn-text">telegram</span>
 </div>
 
@@ -221,10 +234,6 @@ color:#aaa;
 
 <div class="progress-container" id="progressContainer">
 <div id="progressBar"></div>
-</div>
-
-<div class="visualizer">
-<canvas id="audioVisualizer"></canvas>
 </div>
 
 <div class="time">
@@ -241,43 +250,107 @@ color:#aaa;
 let music=document.getElementById("music");
 let playBtn=document.getElementById("playBtn");
 
-/* AUDIO API */
-let audioCtx, analyser, source, dataArray;
-let canvas=document.getElementById("audioVisualizer");
+/* CURSOR */
+document.onmousemove=e=>{
+cursor.style.left=e.clientX+"px";
+cursor.style.top=e.clientY+"px";
+};
+
+/* TYPING (FIX) */
+let words=["ay3ent","streamer","developer"];
+let i=0,j=0;
+
+function type(){
+typing.innerHTML=words[i].slice(0,j)+"|";
+j++;
+if(j>words[i].length+3){
+j=0;
+i=(i+1)%words.length;
+}
+setTimeout(type,120);
+}
+type();
+
+/* TIME FIX */
+music.addEventListener("loadedmetadata",()=>{
+duration.innerText=format(music.duration);
+});
+
+music.addEventListener("timeupdate",()=>{
+let p=(music.currentTime/music.duration)*100;
+progressBar.style.width=p+"%";
+current.innerText=format(music.currentTime);
+});
+
+progressContainer.onclick=e=>{
+let w=e.currentTarget.clientWidth;
+music.currentTime=(e.offsetX/w)*music.duration;
+};
+
+/* PLAY */
+playBtn.onclick=()=>{
+if(music.paused){
+music.play();
+playBtn.innerHTML="❚❚";
+}else{
+music.pause();
+playBtn.innerHTML="▶";
+}
+};
+
+/* AUDIO API CIRCLE */
+let canvas=document.getElementById("circleVis");
 let ctx=canvas.getContext("2d");
 
-function resizeCanvas(){
+function resize(){
 canvas.width=canvas.offsetWidth;
 canvas.height=canvas.offsetHeight;
 }
-resizeCanvas();
-window.onresize=resizeCanvas;
+resize();
 
-function setupAudio(){
+let audioCtx, analyser, data;
+
+function setup(){
 audioCtx=new (window.AudioContext||window.webkitAudioContext)();
 analyser=audioCtx.createAnalyser();
-source=audioCtx.createMediaElementSource(music);
+let src=audioCtx.createMediaElementSource(music);
 
-source.connect(analyser);
+src.connect(analyser);
 analyser.connect(audioCtx.destination);
 
-analyser.fftSize=128;
-dataArray=new Uint8Array(analyser.frequencyBinCount);
+analyser.fftSize=64;
+data=new Uint8Array(analyser.frequencyBinCount);
 
 draw();
 }
 
 function draw(){
 requestAnimationFrame(draw);
-analyser.getByteFrequencyData(dataArray);
+if(!analyser) return;
+
+analyser.getByteFrequencyData(data);
+
 ctx.clearRect(0,0,canvas.width,canvas.height);
 
-let w=canvas.width/dataArray.length;
+let cx=canvas.width/2;
+let cy=canvas.height/2;
+let r=60;
 
-for(let i=0;i<dataArray.length;i++){
-let h=dataArray[i]/2;
-ctx.fillStyle="#7b2ff7";
-ctx.fillRect(i*w,canvas.height-h,w-2,h);
+for(let i=0;i<data.length;i++){
+let angle=(i/data.length)*Math.PI*2;
+let len=data[i]/4;
+
+let x1=cx+Math.cos(angle)*r;
+let y1=cy+Math.sin(angle)*r;
+
+let x2=cx+Math.cos(angle)*(r+len);
+let y2=cy+Math.sin(angle)*(r+len);
+
+ctx.strokeStyle="#7b2ff7";
+ctx.beginPath();
+ctx.moveTo(x1,y1);
+ctx.lineTo(x2,y2);
+ctx.stroke();
 }
 }
 
@@ -291,51 +364,17 @@ setTimeout(()=>intro.remove(),1000);
 music.play().then(()=>{
 playBtn.innerHTML="❚❚";
 
-if(!audioCtx) setupAudio();
+if(!audioCtx) setup();
 if(audioCtx.state==="suspended") audioCtx.resume();
 });
 };
 
-/* PLAYER */
-playBtn.onclick=()=>{
-if(music.paused){
-music.play();
-playBtn.innerHTML="❚❚";
-}else{
-music.pause();
-playBtn.innerHTML="▶";
+function format(s){
+let m=Math.floor(s/60);
+let sec=Math.floor(s%60);
+if(sec<10) sec="0"+sec;
+return m+":"+sec;
 }
-};
-
-/* 🔥 ИДЕАЛЬНЫЙ TYPING */
-let words=["ay3ent","streamer","developer"];
-let i=0,j=0,del=false;
-
-function type(){
-let txt=words[i];
-
-if(!del){
-typing.innerHTML=txt.slice(0,j++)+"|";
-if(j>txt.length){del=true;setTimeout(type,700);return;}
-}else{
-typing.innerHTML=txt.slice(0,j--)+"|";
-if(j<0){del=false;i=(i+1)%words.length;}
-}
-
-setTimeout(type,100);
-}
-type();
-
-/* TILT */
-document.querySelectorAll(".tilt").forEach(el=>{
-el.addEventListener("mousemove",e=>{
-let r=el.getBoundingClientRect();
-let x=e.clientX-r.left;
-let y=e.clientY-r.top;
-el.style.transform=`rotateX(${-(y/r.height-0.5)*15}deg) rotateY(${(x/r.width-0.5)*15}deg)`;
-});
-el.addEventListener("mouseleave",()=>el.style.transform="rotateX(0) rotateY(0)");
-});
 </script>
 
 </body>
