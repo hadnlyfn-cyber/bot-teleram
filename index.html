@@ -81,6 +81,29 @@ opacity:0;
 transition:1s ease-out;
 }
 
+/* TYPING (NEON EFFECT) */
+.typing{
+color:white;
+font-size:20px; /* размер текста */
+font-weight:900;
+text-align:center;
+margin-top:10px;
+text-shadow: 0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px #ffffff; /* черно-белый неон */
+animation: neonText 1.5s ease-in-out infinite alternate, pulseText 2s ease-in-out infinite;
+}
+
+@keyframes neonText {
+    0% { text-shadow: 0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px #ffffff; }
+    50% { text-shadow: 0 0 8px #ffffff, 0 0 16px #ffffff, 0 0 30px #ffffff, 0 0 60px #ffffff; }
+    100% { text-shadow: 0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px #ffffff; }
+}
+
+@keyframes pulseText {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
 /* AVATAR */
 .avatar-wrap{
 position:relative;
@@ -90,24 +113,6 @@ transform: translateY(0); /* аватарка не двигается */
 }
 
 .avatar{width:100%;height:100%;border-radius:50%;}
-/* Убираем круглый визуализатор (canvas #circleVis) */
-
-/* TYPING (NEON EFFECT) */
-.typing{
-color:white;
-font-size:20px; /* изменен размер текста на 20px */
-font-weight:900;
-text-align:center;
-margin-top:10px;
-text-shadow: 0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px #ffffff; /* неоновый белый */
-animation: neonText 1.5s ease-in-out infinite alternate;
-}
-
-@keyframes neonText {
-    0% { text-shadow: 0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px #ffffff; }
-    50% { text-shadow: 0 0 8px #ff00ff, 0 0 16px #ff00ff, 0 0 30px #ff00ff, 0 0 60px #ff00ff; }
-    100% { text-shadow: 0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px #ffffff; }
-}
 
 /* BUTTONS */
 .buttons{
@@ -271,9 +276,6 @@ height:60px;
 </div>
 
 </div>
-
-<!-- Убираем канвас для кругового визуализатора -->
-<!-- <canvas id="circleVis"></canvas> -->
 
 <canvas id="audioVis"></canvas>
 
