@@ -14,18 +14,6 @@ body {
     font-family: "Bungee", sans-serif;
 }
 
-/* КУРСОР */
-.cursor {
-    width: 18px;
-    height: 18px;
-    border: 2px solid #7b2ff7;
-    border-radius: 50%;
-    position: fixed;
-    pointer-events: none;
-    transform: translate(-50%, -50%);
-    box-shadow: 0 0 20px #7b2ff7;
-}
-
 /* INTRO */
 .intro {
     position: fixed;
@@ -76,7 +64,14 @@ body {
     height: 140px;
     border-radius: 50%;
     box-shadow: 0 0 30px #7b2ff7;
+    margin-bottom: 15px;
+}
+
+/* TYPING TEXT */
+.typing {
+    color: white;
     margin-bottom: 20px;
+    height: 20px;
 }
 
 /* BUTTONS */
@@ -100,89 +95,90 @@ body {
 
 .btn-img:hover {
     transform: scale(1.1);
-    filter: drop-shadow(0 0 10px #7b2ff7);
 }
 
-.btn-text {
-    color: white;
-    opacity: 0;
-    transition: 0.3s;
-}
-
-.btn-row:hover .btn-text {
-    opacity: 1;
-}
-
-/* 🎧 AUDIO PLAYER */
+/* 🎧 PLAYER */
 .player {
     position: fixed;
-    bottom: 25px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 15px;
-
-    padding: 12px 18px;
-    border-radius: 25px;
-
-    background: rgba(255,255,255,0.08);
+    width: 320px;
+    padding: 12px 15px;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.7);
     backdrop-filter: blur(15px);
-
-    box-shadow: 0 0 20px rgba(123,47,247,0.4);
+    box-shadow: 0 0 25px rgba(123,47,247,0.5);
 }
 
-/* play button */
+.controls {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
 .play-btn {
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     border: none;
     cursor: pointer;
-
-    background: linear-gradient(45deg,#7b2ff7,#1e3c72);
-    color: white;
-    font-size: 16px;
-
-    box-shadow: 0 0 10px #7b2ff7;
-    transition: 0.2s;
+    background: white;
+    color: black;
+    font-size: 18px;
 }
 
-.play-btn:hover {
-    transform: scale(1.1);
-}
-
-/* volume */
-.volume {
+.progress {
+    width: 100%;
     appearance: none;
-    width: 120px;
-    height: 6px;
-    border-radius: 10px;
-    background: rgba(255,255,255,0.2);
-    outline: none;
+    height: 4px;
+    background: #555;
+}
+
+.progress::-webkit-slider-thumb {
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    background: white;
+    border-radius: 50%;
+}
+
+.bottom {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+}
+
+.time {
+    color: #aaa;
+    font-size: 10px;
+}
+
+.volume {
+    width: 80px;
+    appearance: none;
+    height: 4px;
+    background: #777;
 }
 
 .volume::-webkit-slider-thumb {
     appearance: none;
-    width: 14px;
-    height: 14px;
+    width: 10px;
+    height: 10px;
+    background: white;
     border-radius: 50%;
-    background: #7b2ff7;
-    box-shadow: 0 0 10px #7b2ff7;
-    cursor: pointer;
 }
 
 /* MOBILE */
 @media(max-width:600px){
     .avatar {width:100px;height:100px;}
     .btn-img {width:65px;}
+    .player {width:260px;}
 }
 </style>
 </head>
 
 <body>
-
-<div class="cursor" id="cursor"></div>
 
 <div class="intro" onclick="enterSite()">
 <div class="intro-text">AY3ENT BIO</div>
@@ -193,73 +189,118 @@ body {
 <div class="background"></div>
 
 <div class="container">
-
 <img src="photo.jpg" class="avatar">
+
+<div class="typing" id="typing"></div>
 
 <div class="buttons">
 <div class="btn-row">
 <a href="https://twitch.tv/ay3ent"><img src="twitch2.png" class="btn-img"></a>
-<span class="btn-text">twitch</span>
 </div>
 
 <div class="btn-row">
 <a href="https://t.me/ay3ent"><img src="telegram.png" class="btn-img"></a>
-<span class="btn-text">telegram</span>
 </div>
 </div>
-
 </div>
 
-<!-- 🎧 PLAYER -->
+<!-- PLAYER -->
 <div class="player">
-<button class="play-btn" id="playBtn">▶</button>
-<input type="range" min="0" max="1" step="0.01" value="0.5" id="volume" class="volume">
+
+<div class="controls">
+<button id="playBtn" class="play-btn">▶</button>
 </div>
 
-<audio id="music" loop src="music.mp3"></audio>
-<audio id="clickSound" src="click.mp3"></audio>
+<input type="range" id="progress" class="progress" value="0">
+
+<div class="bottom">
+<span id="currentTime" class="time">0:00</span>
+
+<input type="range" id="volume" class="volume" min="0" max="1" step="0.01" value="0.5">
+
+<span id="duration" class="time">0:00</span>
+</div>
+
+</div>
+
+<audio id="music" src="music.mp3"></audio>
 
 </div>
 
 <script>
 let music = document.getElementById("music");
-let clickSound = document.getElementById("clickSound");
 let playBtn = document.getElementById("playBtn");
+let progress = document.getElementById("progress");
 let volume = document.getElementById("volume");
+let currentTime = document.getElementById("currentTime");
+let duration = document.getElementById("duration");
 
 /* ENTER */
 function enterSite(){
 document.querySelector(".intro").style.opacity="0";
 document.getElementById("main").style.opacity="1";
-
 setTimeout(()=>document.querySelector(".intro").remove(),1000);
-
-clickSound.play();
 music.play();
 }
 
-/* PLAY / PAUSE */
-playBtn.onclick = () => {
+/* PLAY */
+playBtn.onclick = ()=>{
 if(music.paused){
 music.play();
-playBtn.innerHTML = "❚❚";
+playBtn.innerHTML="❚❚";
 }else{
 music.pause();
-playBtn.innerHTML = "▶";
+playBtn.innerHTML="▶";
 }
 };
+
+/* TIME */
+music.addEventListener("loadedmetadata", ()=>{
+duration.innerText = formatTime(music.duration);
+});
+
+music.addEventListener("timeupdate", ()=>{
+progress.value = (music.currentTime / music.duration)*100;
+currentTime.innerText = formatTime(music.currentTime);
+});
+
+/* SEEK */
+progress.addEventListener("input", ()=>{
+music.currentTime = (progress.value/100)*music.duration;
+});
 
 /* VOLUME */
 volume.addEventListener("input", ()=>{
 music.volume = volume.value;
 });
 
-/* CURSOR */
-let cursor = document.getElementById("cursor");
-document.addEventListener("mousemove", e=>{
-cursor.style.left = e.clientX+"px";
-cursor.style.top = e.clientY+"px";
-});
+/* FORMAT TIME */
+function formatTime(sec){
+let m = Math.floor(sec/60);
+let s = Math.floor(sec%60);
+if(s<10)s="0"+s;
+return m+":"+s;
+}
+
+/* 🧠 TYPING (МЕДЛЕННЕЕ В 2 РАЗА) */
+let words = ["ay3ent...", "streamer...", "developer..."];
+let i=0, j=0;
+
+function type(){
+document.getElementById("typing").innerText = words[i].slice(0,j);
+j++;
+
+if(j > words[i].length){
+setTimeout(()=>{
+j=0;
+i = (i+1)%words.length;
+}, 1500);
+}
+
+setTimeout(type, 240); // медленнее (было ~120)
+}
+
+type();
 </script>
 
 </body>
