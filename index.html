@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>AY3ENT</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
 
 <style>
@@ -25,25 +24,28 @@ body {
     align-items: center;
     z-index: 999;
     cursor: pointer;
+    transition: 1s;
 }
 
 .intro-text {
     color: white;
-    font-size: 40px;
-    text-shadow: 0 0 20px #7b2ff7;
-    animation: pulse 1.5s infinite;
+    font-size: 42px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 25px #7b2ff7;
+    animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-    0% {opacity: 0.5;}
+    0% {opacity: 0.6;}
     50% {opacity: 1;}
-    100% {opacity: 0.5;}
+    100% {opacity: 0.6;}
 }
 
-/* ОСНОВНОЙ САЙТ */
+/* MAIN */
 .main {
     opacity: 0;
-    transition: 1s;
+    filter: blur(10px);
+    transition: 1.2s ease;
 }
 
 .background {
@@ -99,7 +101,7 @@ body {
 }
 
 .btn-img:hover {
-    transform: scale(1.1);
+    transform: scale(1.08);
     filter: drop-shadow(0 0 15px #7b2ff7);
 }
 
@@ -144,9 +146,7 @@ body {
     transform: translateX(-50%);
     
     display: flex;
-    gap: 10px;
     padding: 10px 15px;
-
     background: rgba(255,255,255,0.08);
     backdrop-filter: blur(10px);
     border-radius: 20px;
@@ -162,7 +162,7 @@ body {
 
 <!-- INTRO -->
 <div class="intro" onclick="enterSite()">
-    <div class="intro-text">ENTER</div>
+    <div class="intro-text">AY3ENT BIO</div>
 </div>
 
 <!-- MAIN -->
@@ -213,13 +213,19 @@ let volume = document.getElementById("volume");
 
 let audioCtx, analyser, source;
 
-// ENTER
+// ВХОД
 function enterSite() {
-    document.querySelector(".intro").style.opacity = "0";
+    let intro = document.querySelector(".intro");
+    let main = document.getElementById("main");
+
+    intro.style.opacity = "0";
+    intro.style.filter = "blur(10px)";
+
     setTimeout(() => {
-        document.querySelector(".intro").style.display = "none";
-        document.getElementById("main").style.opacity = "1";
-    }, 500);
+        intro.style.display = "none";
+        main.style.opacity = "1";
+        main.style.filter = "blur(0)";
+    }, 800);
 
     music.play();
     setupAudio();
