@@ -18,13 +18,25 @@ cursor:none;
 /* CURSOR */
 .cursor{
 position:fixed;
-width:18px;
-height:18px;
+width:10px;
+height:10px;
 border-radius:50%;
-background:#7b2ff7;
+background:white;
 pointer-events:none;
+z-index:9999;
 transform:translate(-50%,-50%);
-box-shadow:0 0 25px #7b2ff7;
+}
+
+.cursor-glow{
+position:fixed;
+width:40px;
+height:40px;
+border-radius:50%;
+background:rgba(123,47,247,0.25);
+pointer-events:none;
+z-index:9998;
+transform:translate(-50%,-50%);
+filter:blur(10px);
 }
 
 /* INTRO */
@@ -98,6 +110,15 @@ width:100%;
 height:100%;
 }
 
+/* BOTTOM VIS */
+#audioVis{
+position:absolute;
+bottom:0;
+left:0;
+width:100%;
+height:60px;
+}
+
 /* BUTTONS */
 .buttons{
 margin-top:20px;
@@ -141,7 +162,7 @@ box-shadow:0 0 20px #7b2ff7;
 /* PLAYER */
 .player{
 position:absolute;
-bottom:20px;
+bottom:80px;
 width:80%;
 }
 .play-btn{
@@ -184,6 +205,7 @@ color:#aaa;
 <body>
 
 <div class="cursor" id="cursor"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
 
 <div class="intro" id="intro">
 <h1 style="color:white;">AY3ENT BIO</h1>
@@ -231,6 +253,8 @@ color:#aaa;
 </div>
 </div>
 
+<canvas id="audioVis"></canvas>
+
 </div>
 
 <audio id="music" src="music.mp3"></audio>
@@ -239,61 +263,103 @@ color:#aaa;
 const music = document.getElementById("music");
 const playBtn = document.getElementById("playBtn");
 
-/* CURSOR SMOOTH */
-const cursor = document.getElementById("cursor");
-let x=0,y=0,tx=0,ty=0;
+/* CURSOR */
+const cur=document.getElementById("cursor");
+const glow=document.getElementById("cursorGlow");
 
-document.addEventListener("mousemove",e=>{
-tx=e.clientX;
-ty=e.clientY;
-});
+let x=0,y=0,fx=0,fy=0;
 
-function loop(){
-x+=(tx-x)*0.2;
-y+=(ty-y)*0.2;
-cursor.style.left=x+"px";
-cursor.style.top=y+"px";
+document.onmousemove=e=>{
+x=e.clientX;y=e.clientY;
+cur.style.left=x+"px";
+cur.style.top=y+"px";
+};
+
+(function loop(){
+fx+=(x-fx)*0.15;
+fy+=(y-fy)*0.15;
+glow.style.left=fx+"px";
+glow.style.top=fy+"px";
 requestAnimationFrame(loop);
-}
-loop();
+})();
 
 /* TYPING */
 const typing=document.getElementById("typing");
 let words=["ay3ent","streamer","developer"];
 let i=0,j=0;
-
-(function type(){
+(function t(){
 typing.innerHTML=words[i].slice(0,j)+"|";
 j++;
-if(j>words[i].length+3){
-j=0;
-i=(i+1)%words.length;
-}
-setTimeout(type,120);
+if(j>words[i].length+3){j=0;i=(i+1)%words.length;}
+setTimeout(t,120);
 })();
 
-/* TIME */
-music.addEventListener("loadedmetadata",()=>{
-duration.innerText=format(music.duration);
-});
+/* AUDIO */
+const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+const analyser=audioCtx.createAnalyser();
+const src=audioCtx.createMediaElementSource(music);
+src.connect(analyser);
+analyser.connect(audioCtx.destination);
+analyser.fftSize=128;
 
-music.addEventListener("timeupdate",()=>{
-if(music.duration){
-let p=(music.currentTime/music.duration)*100;
-progressBar.style.width=p+"%";
-current.innerText=format(music.currentTime);
+const data=new Uint8Array(analyser.frequencyBinCount);
+
+/* VIS */
+const c1=document.getElementById("audioVis");
+const ctx1=c1.getContext("2d");
+
+const c2=document.getElementById("circleVis");
+const ctx2=c2.getContext("2d");
+
+function resize(){
+c1.width=window.innerWidth;
+c1.height=60;
+c2.width=c2.offsetWidth;
+c2.height=c2.offsetHeight;
 }
-});
+resize();
+window.onresize=resize;
 
-progressContainer.onclick=e=>{
-let w=e.currentTarget.clientWidth;
-music.currentTime=(e.offsetX/w)*music.duration;
-};
+function draw(){
+requestAnimationFrame(draw);
+analyser.getByteFrequencyData(data);
+
+/* bottom bars */
+ctx1.clearRect(0,0,c1.width,c1.height);
+let w=c1.width/data.length;
+for(let i=0;i<data.length;i++){
+let h=data[i]/2;
+ctx1.fillStyle="#7b2ff7";
+ctx1.fillRect(i*w,c1.height-h,w-2,h);
+}
+
+/* circle */
+ctx2.clearRect(0,0,c2.width,c2.height);
+let cx=c2.width/2;
+let cy=c2.height/2;
+let r=60;
+
+for(let i=0;i<data.length;i++){
+let a=(i/data.length)*Math.PI*2;
+let len=data[i]/3;
+let x1=cx+Math.cos(a)*r;
+let y1=cy+Math.sin(a)*r;
+let x2=cx+Math.cos(a)*(r+len);
+let y2=cy+Math.sin(a)*(r+len);
+ctx2.beginPath();
+ctx2.moveTo(x1,y1);
+ctx2.lineTo(x2,y2);
+ctx2.strokeStyle="#7b2ff7";
+ctx2.stroke();
+}
+}
 
 /* PLAY */
 playBtn.onclick=()=>{
 if(music.paused){
 music.play();
+audioCtx.resume();
+draw();
 playBtn.innerHTML="❚❚";
 }else{
 music.pause();
@@ -301,85 +367,30 @@ playBtn.innerHTML="▶";
 }
 };
 
-/* VISUALIZER */
-const canvas=document.getElementById("circleVis");
-const ctx=canvas.getContext("2d");
-
-function resize(){
-canvas.width=canvas.offsetWidth;
-canvas.height=canvas.offsetHeight;
-}
-resize();
-window.addEventListener("resize",resize);
-
-let audioCtx, analyser, data;
-
-function setup(){
-audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-analyser=audioCtx.createAnalyser();
-
-let src=audioCtx.createMediaElementSource(music);
-src.connect(analyser);
-analyser.connect(audioCtx.destination);
-
-analyser.fftSize=128;
-data=new Uint8Array(analyser.frequencyBinCount);
-
-draw();
-}
-
-function draw(){
-requestAnimationFrame(draw);
-if(!analyser) return;
-
-analyser.getByteFrequencyData(data);
-
-ctx.clearRect(0,0,canvas.width,canvas.height);
-
-let cx=canvas.width/2;
-let cy=canvas.height/2;
-let r=60;
-
-for(let i=0;i<data.length;i++){
-let angle=(i/data.length)*Math.PI*2;
-let len=data[i]/3;
-
-let x1=cx+Math.cos(angle)*r;
-let y1=cy+Math.sin(angle)*r;
-
-let x2=cx+Math.cos(angle)*(r+len);
-let y2=cy+Math.sin(angle)*(r+len);
-
-ctx.strokeStyle="#7b2ff7";
-ctx.lineWidth=2;
-
-ctx.beginPath();
-ctx.moveTo(x1,y1);
-ctx.lineTo(x2,y2);
-ctx.stroke();
-}
-}
+/* TIME */
+music.onloadedmetadata=()=>duration.innerText=format(music.duration);
+music.ontimeupdate=()=>{
+let p=(music.currentTime/music.duration)*100;
+progressBar.style.width=p+"%";
+current.innerText=format(music.currentTime);
+};
 
 /* ENTER */
 intro.onclick=()=>{
 intro.style.opacity=0;
 main.style.opacity=1;
-
 setTimeout(()=>intro.remove(),1000);
 
-music.play().then(()=>{
+music.play();
+audioCtx.resume();
+draw();
 playBtn.innerHTML="❚❚";
-
-if(!audioCtx) setup();
-if(audioCtx.state==="suspended") audioCtx.resume();
-});
 };
 
 function format(s){
 let m=Math.floor(s/60);
 let sec=Math.floor(s%60);
-if(sec<10) sec="0"+sec;
-return m+":"+sec;
+return m+":"+(sec<10?"0":"")+sec;
 }
 </script>
 
