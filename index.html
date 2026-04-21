@@ -2,8 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>AY3ENT FINAL</title>
-
+<title>AY3ENT BIO</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
@@ -161,6 +160,7 @@ color:white;
 border:none;
 margin:auto;
 display:block;
+cursor:pointer;
 }
 
 /* PROGRESS */
@@ -196,11 +196,9 @@ color:#aaa;
 font-size:11px;
 }
 
-/* 📱 MOBILE */
+/* MOBILE */
 @media(max-width:768px){
-
 body{cursor:auto;}
-
 .cursor,.cursor-follower{display:none;}
 
 .wrapper{
@@ -218,7 +216,6 @@ height:110px;
 .player{
 width:100%;
 }
-
 }
 </style>
 </head>
@@ -243,7 +240,7 @@ width:100%;
 <img src="photo.jpg" class="avatar">
 </div>
 
-<div id="views" style="color:#aaa;">👁 ...</div>
+<div id="views" style="color:#aaa;">👁 0</div>
 
 <div class="buttons">
 <div class="btn-row">
@@ -282,12 +279,31 @@ width:100%;
 
 <audio id="music" src="music.mp3"></audio>
 
-<script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-/* COUNT FIX */
-fetch("https://api.countapi.xyz/hit/ay3ent-bio/views?nocache="+Date.now())
-.then(r=>r.json())
-.then(d=>views.innerText="👁 "+d.value);
+<script>
+/* SUPABASE */
+const supabase = window.supabase.createClient(
+  "https://ionsrvajvxpifitqljgo.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlvbnNydmFqdnhwaWZpdHFsamdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MjAzMzUsImV4cCI6MjA5MjI5NjMzNX0.nhM_fUiw99ZxzlEwZMS6kBJNXjNzGNpdfwo9x5mEgF0"
+);
+
+let uid = localStorage.getItem("uid");
+
+if(!uid){
+  uid = crypto.randomUUID();
+  localStorage.setItem("uid", uid);
+  supabase.from("views").insert([{ user_id: uid }]);
+}
+
+async function loadViews(){
+  let { count } = await supabase
+    .from("views")
+    .select("*", { count: "exact", head: true });
+
+  document.getElementById("views").innerText = "👁 " + count;
+}
+loadViews();
 
 /* CURSOR */
 let cur=cursor, fol=cursorFollower;
@@ -308,8 +324,8 @@ requestAnimationFrame(loop);
 })();
 
 /* AUDIO */
-let music=document.getElementById("music");
-let playBtn=document.getElementById("playBtn");
+let music=music;
+let playBtn=playBtn;
 
 let ctx=new AudioContext();
 let analyser=ctx.createAnalyser();
@@ -318,10 +334,6 @@ src.connect(analyser);
 analyser.connect(ctx.destination);
 
 let data=new Uint8Array(analyser.frequencyBinCount);
-
-/* VIS */
-let c1=audioVis.getContext("2d");
-let c2=circleVis.getContext("2d");
 
 function resize(){
 audioVis.width=audioVis.offsetWidth;
@@ -337,6 +349,7 @@ requestAnimationFrame(draw);
 analyser.getByteFrequencyData(data);
 
 /* bars */
+let c1=audioVis.getContext("2d");
 c1.clearRect(0,0,audioVis.width,audioVis.height);
 let w=audioVis.width/data.length;
 for(let i=0;i<data.length;i++){
@@ -346,6 +359,7 @@ c1.fillRect(i*w,audioVis.height-h,w-2,h);
 }
 
 /* circle */
+let c2=circleVis.getContext("2d");
 c2.clearRect(0,0,circleVis.width,circleVis.height);
 let cx=circleVis.width/2;
 let cy=circleVis.height/2;
@@ -370,7 +384,6 @@ c2.stroke();
 intro.onclick=()=>{
 intro.style.opacity=0;
 main.style.opacity=1;
-
 setTimeout(()=>intro.remove(),1000);
 
 music.play();
@@ -419,7 +432,6 @@ j++;
 if(j>wds[i].length+3){j=0;i=(i+1)%wds.length;}
 setTimeout(t,120);
 })();
-
 </script>
 
 </body>
