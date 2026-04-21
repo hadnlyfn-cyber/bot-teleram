@@ -28,26 +28,18 @@ body {
     transition: 1s;
 }
 
-/* MAIN */
 .main {
     opacity: 0;
     transition: 1.5s;
 }
 
-/* PARALLAX */
+/* BG */
 .background {
     position: fixed;
     width: 120%;
     height: 120%;
     background: url('bg.gif') center/cover no-repeat;
     z-index: -2;
-    transition: transform 0.1s;
-}
-
-/* PARTICLES */
-canvas {
-    position: fixed;
-    z-index: -1;
 }
 
 /* CONTENT */
@@ -59,21 +51,7 @@ canvas {
     justify-content: center;
 }
 
-/* AVATAR + GLOW */
-.avatar-wrap {
-    position: relative;
-}
-
-.avatar-glow {
-    position: absolute;
-    width: 200px;
-    height: 200px;
-    background: radial-gradient(circle, rgba(123,47,247,0.4), transparent);
-    filter: blur(40px);
-    z-index: -1;
-    transform: translate(-30px,-30px);
-}
-
+/* AVATAR */
 .avatar {
     width: 140px;
     height: 140px;
@@ -82,28 +60,27 @@ canvas {
     box-shadow: 0 0 30px #7b2ff7;
 }
 
-/* VIEWS */
-.views {
-    color: #aaa;
-    margin: 10px;
-    transition: 0.3s;
+/* STATUS */
+.status {
+    color: #00ff88;
+    font-size: 12px;
 }
 
-/* TEXT */
-.typing {
-    color: white;
-    margin-bottom: 20px;
+/* STATS */
+.stats {
+    color: #aaa;
+    margin: 10px;
 }
 
 /* BUTTONS */
 .buttons {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 15px;
 }
 
 .btn {
-    padding: 12px 20px;
+    padding: 10px 20px;
     border-radius: 25px;
     background: rgba(255,255,255,0.05);
     backdrop-filter: blur(12px);
@@ -112,32 +89,14 @@ canvas {
     align-items: center;
     gap: 10px;
     transition: 0.25s;
-    transform-style: preserve-3d;
-    position: relative;
-    overflow: hidden;
 }
 
 .btn img {
     width: 55px;
-    border-radius: 12px;
 }
 
 .btn:hover {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 0 25px rgba(123,47,247,0.6);
-}
-
-/* ripple */
-.btn::after {
-    content: "";
-    position: absolute;
-    width: 0;
-    height: 0;
-    background: rgba(255,255,255,0.2);
-    border-radius: 50%;
-    transform: scale(0);
-    opacity: 0;
-    pointer-events: none;
+    transform: scale(1.05);
 }
 
 /* PLAYER */
@@ -146,12 +105,26 @@ canvas {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 300px;
+    width: 320px;
+    padding: 10px;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.7);
 }
 
-canvas#visualizer {
-    width: 100%;
-    height: 60px;
+.play-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+/* ANIM */
+.fade {
+    animation: fadeIn 1.5s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {opacity:0; transform: translateY(20px);}
+    to {opacity:1; transform: translateY(0);}
 }
 </style>
 </head>
@@ -164,34 +137,32 @@ canvas#visualizer {
 
 <div class="main" id="main">
 
-<div class="background" id="bg"></div>
-<canvas id="particles"></canvas>
+<div class="background"></div>
 
-<div class="container">
+<div class="container fade">
 
-<div class="avatar-wrap">
-<div class="avatar-glow" id="glow"></div>
 <img src="photo.jpg" class="avatar">
-</div>
 
-<div class="views" id="views">👁 0</div>
+<div class="status">● online</div>
 
-<div class="typing" id="typing"></div>
+<div class="stats" id="views">👁 0 | 👥 0</div>
 
 <div class="buttons">
-<a href="https://twitch.tv/ay3ent" class="btn tilt">
+<a href="https://twitch.tv/ay3ent" class="btn">
 <img src="twitch2.png"> twitch
 </a>
 
-<a href="https://t.me/ay3ent" class="btn tilt">
+<a href="https://t.me/ay3ent" class="btn">
 <img src="telegram.png"> telegram
 </a>
 </div>
 
 </div>
 
+<!-- PLAYER -->
 <div class="player">
-<canvas id="visualizer"></canvas>
+<button id="playBtn" class="play-btn">▶</button>
+<input type="range" id="volume" min="0" max="1" step="0.01" value="0.5">
 </div>
 
 <audio id="music" src="music.mp3"></audio>
@@ -201,7 +172,7 @@ canvas#visualizer {
 <!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, get, set, onValue, onDisconnect, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIza...",
@@ -215,112 +186,66 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const viewRef = ref(db, "views");
 
+/* VIEWS */
+const viewRef = ref(db, "views");
 get(viewRef).then(s=>{
 let c=s.exists()?s.val():0;
 set(viewRef,c+1);
 });
 
+/* ONLINE USERS */
+const onlineRef = ref(db, "online");
+const user = push(onlineRef);
+
+set(user, true);
+onDisconnect(user).remove();
+
+onValue(onlineRef, s=>{
+let count = s.exists() ? Object.keys(s.val()).length : 0;
+document.getElementById("views").innerText =
+"👁 " + (s.val()?.views || 0) + " | 👥 " + count;
+});
+
+/* VIEW UPDATE */
 onValue(viewRef, s=>{
-document.getElementById("views").innerText="👁 "+s.val();
+let views = s.val() || 0;
+onValue(onlineRef, snap=>{
+let online = snap.exists() ? Object.keys(snap.val()).length : 0;
+document.getElementById("views").innerText =
+"👁 " + views + " | 👥 " + online;
+});
 });
 </script>
 
 <script>
-let music=document.getElementById("music");
+let music = document.getElementById("music");
 
 /* ENTER */
 function enterSite(){
 document.querySelector(".intro").style.opacity="0";
 document.getElementById("main").style.opacity="1";
 setTimeout(()=>document.querySelector(".intro").remove(),1000);
+
+/* 🔥 запуск музыки */
+music.play().catch(()=>{});
+}
+
+/* PLAYER */
+let playBtn=document.getElementById("playBtn");
+let volume=document.getElementById("volume");
+
+playBtn.onclick=()=>{
+if(music.paused){
 music.play();
-initAudio();
+playBtn.innerHTML="❚❚";
+}else{
+music.pause();
+playBtn.innerHTML="▶";
 }
+};
 
-/* PARALLAX + GLOW */
-document.addEventListener("mousemove", e=>{
-let x=(e.clientX/window.innerWidth-0.5)*20;
-let y=(e.clientY/window.innerHeight-0.5)*20;
-document.getElementById("bg").style.transform=`translate(${x}px,${y}px)`;
-
-document.getElementById("glow").style.transform=`translate(${x*2}px,${y*2}px)`;
-});
-
-/* PARTICLES */
-let canvas=document.getElementById("particles");
-let ctx=canvas.getContext("2d");
-canvas.width=innerWidth;
-canvas.height=innerHeight;
-
-let p=[];
-for(let i=0;i<50;i++){
-p.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-0.5)*0.2,vy:(Math.random()-0.5)*0.2});
-}
-
-function draw(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
-p.forEach(a=>{
-a.x+=a.vx;a.y+=a.vy;
-ctx.beginPath();
-ctx.arc(a.x,a.y,1,0,Math.PI*2);
-ctx.fillStyle="rgba(123,47,247,0.3)";
-ctx.fill();
-});
-requestAnimationFrame(draw);
-}
-draw();
-
-/* VISUALIZER */
-function initAudio(){
-const ctxA=new AudioContext();
-const src=ctxA.createMediaElementSource(music);
-const analyser=ctxA.createAnalyser();
-
-src.connect(analyser);
-analyser.connect(ctxA.destination);
-
-analyser.fftSize=128;
-let data=new Uint8Array(analyser.frequencyBinCount);
-
-const canvas=document.getElementById("visualizer");
-const ctx=canvas.getContext("2d");
-
-function render(){
-requestAnimationFrame(render);
-analyser.getByteFrequencyData(data);
-ctx.clearRect(0,0,canvas.width,canvas.height);
-
-let w=canvas.width/data.length;
-data.forEach((v,i)=>{
-ctx.fillStyle="rgba(123,47,247,0.8)";
-ctx.fillRect(i*w,canvas.height-v/2,w-2,v/2);
-});
-}
-render();
-}
-
-/* TYPING */
-let words=["ay3ent...","streamer...","developer..."];
-let i=0,j=0;
-function type(){
-document.getElementById("typing").innerText=words[i].slice(0,j++);
-if(j>words[i].length){j=0;i=(i+1)%words.length;}
-setTimeout(type,180);
-}
-type();
-
-/* TILT */
-document.querySelectorAll(".tilt").forEach(el=>{
-el.addEventListener("mousemove",e=>{
-let r=el.getBoundingClientRect();
-let x=e.clientX-r.left;
-let y=e.clientY-r.top;
-el.style.transform=`rotateX(${-(y/r.height-0.5)*15}deg) rotateY(${(x/r.width-0.5)*15}deg)`;
-});
-el.addEventListener("mouseleave",()=>el.style.transform="rotateX(0) rotateY(0)");
-});
+volume.oninput=e=>music.volume=e.target.value;
 </script>
 
 </body>
