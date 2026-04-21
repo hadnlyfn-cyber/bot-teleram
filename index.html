@@ -14,7 +14,6 @@ body {
     font-family: "Bungee", sans-serif;
 }
 
-/* INTRO */
 .intro {
     position: fixed;
     width: 100%;
@@ -25,22 +24,11 @@ body {
     align-items: center;
     z-index: 999;
     cursor: pointer;
-    transition: opacity 1s ease;
+    transition: 1s;
 }
 
-.intro-text {
-    color: white;
-    font-size: 40px;
-    text-shadow: 0 0 25px #7b2ff7;
-}
+.main { opacity: 0; transition: 1.5s; }
 
-/* MAIN */
-.main {
-    opacity: 0;
-    transition: opacity 1.5s ease;
-}
-
-/* BACKGROUND */
 .background {
     position: fixed;
     width: 110%;
@@ -49,15 +37,8 @@ body {
     z-index: -2;
 }
 
-/* PARTICLES */
-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: -1;
-}
+canvas { position: fixed; z-index: -1; }
 
-/* CONTENT */
 .container {
     height: 100vh;
     display: flex;
@@ -66,22 +47,22 @@ canvas {
     justify-content: center;
 }
 
-/* AVATAR */
 .avatar {
     width: 140px;
-    height: 140px;
     border-radius: 50%;
     box-shadow: 0 0 25px #7b2ff7;
-    margin-bottom: 15px;
 }
 
-/* TYPING */
+.views {
+    color: #aaa;
+    margin: 10px;
+}
+
 .typing {
     color: white;
     margin-bottom: 20px;
 }
 
-/* BUTTONS */
 .buttons {
     display: flex;
     flex-direction: column;
@@ -91,49 +72,27 @@ canvas {
 .btn-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-}
-
-/* КНОПКА */
-.btn {
-    display: flex;
-    align-items: center;
     gap: 10px;
+}
 
-    padding: 10px 16px;
-    border-radius: 25px;
-
+.btn {
+    padding: 10px;
+    border-radius: 20px;
     background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(12px);
-
-    border: 1px solid rgba(123,47,247,0.3);
-
-    transition: 0.25s;
+    backdrop-filter: blur(10px);
+    transition: 0.2s;
+    transform-style: preserve-3d;
 }
 
-/* PNG */
-.btn img {
-    width: 60px;
-    border-radius: 15px;
-}
+.btn img { width: 60px; }
 
-/* HOVER */
-.btn:hover {
-    transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 0 20px rgba(123,47,247,0.6);
-    background: linear-gradient(45deg, rgba(123,47,247,0.2), rgba(30,60,114,0.2));
-}
-
-/* TEXT */
 .btn-text {
     color: white;
     opacity: 0;
     transition: 0.3s;
 }
 
-.btn-row:hover .btn-text {
-    opacity: 1;
-}
+.btn-row:hover .btn-text { opacity: 1; }
 
 /* PLAYER */
 .player {
@@ -141,60 +100,15 @@ canvas {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 300px;
-    padding: 12px;
-    border-radius: 20px;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 20px rgba(123,47,247,0.5);
 }
 
-.controls {
-    display: flex;
-    justify-content: center;
-}
-
-.play-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: none;
-    background: white;
-    cursor: pointer;
-}
-
-.progress {
-    width: 100%;
-    margin-top: 6px;
-}
-
-.bottom {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 5px;
-}
-
-.time {
-    color: #aaa;
-    font-size: 10px;
-}
-
-.volume {
-    width: 70px;
-}
-
-/* MOBILE */
-@media(max-width:600px){
-    .avatar {width:100px;height:100px;}
-    .btn img {width:50px;}
-}
 </style>
 </head>
 
 <body>
 
 <div class="intro" onclick="enterSite()">
-<div class="intro-text">AY3ENT BIO</div>
+<h1 style="color:white;">AY3ENT BIO</h1>
 </div>
 
 <div class="main" id="main">
@@ -206,19 +120,21 @@ canvas {
 
 <img src="photo.jpg" class="avatar">
 
+<div class="views" id="views">👁 0</div>
+
 <div class="typing" id="typing"></div>
 
 <div class="buttons">
 
 <div class="btn-row">
-<a href="https://twitch.tv/ay3ent" class="btn">
+<a href="https://twitch.tv/ay3ent" class="btn tilt">
 <img src="twitch2.png">
 </a>
 <span class="btn-text">twitch</span>
 </div>
 
 <div class="btn-row">
-<a href="https://t.me/ay3ent" class="btn">
+<a href="https://t.me/ay3ent" class="btn tilt">
 <img src="telegram.png">
 </a>
 <span class="btn-text">telegram</span>
@@ -229,46 +145,59 @@ canvas {
 </div>
 
 <div class="player">
-<div class="controls">
-<button id="playBtn" class="play-btn">▶</button>
-</div>
-
-<input type="range" id="progress" class="progress">
-
-<div class="bottom">
-<span id="currentTime" class="time">0:00</span>
-<input type="range" id="volume" class="volume" min="0" max="1" step="0.01">
-<span id="duration" class="time">0:00</span>
-</div>
+<button id="playBtn">▶</button>
+<input type="range" id="volume" min="0" max="1" step="0.01">
 </div>
 
 <audio id="music" src="music.mp3"></audio>
 
 </div>
 
+<!-- 🔥 FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB5YVBwTUnlCLzrZgxuoNhbkdEMDReOJKo",
+  authDomain: "boty-b7a7f.firebaseapp.com",
+  databaseURL: "https://boty-b7a7f-default-rtdb.firebaseio.com/",
+  projectId: "boty-b7a7f",
+  storageBucket: "boty-b7a7f.firebasestorage.app",
+  messagingSenderId: "1011485229092",
+  appId: "1:1011485229092:web:1d3e8c272845b36dcc18b1"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const viewRef = ref(db, "views");
+
+get(viewRef).then((snapshot) => {
+  let count = snapshot.exists() ? snapshot.val() : 0;
+  set(viewRef, count + 1);
+});
+
+onValue(viewRef, (snapshot) => {
+  document.getElementById("views").innerText = "👁 " + snapshot.val();
+});
+</script>
+
 <script>
-/* ENTER */
 function enterSite(){
 document.querySelector(".intro").style.opacity="0";
 document.getElementById("main").style.opacity="1";
 setTimeout(()=>document.querySelector(".intro").remove(),1000);
-music.play();
 }
 
-/* PARTICLES */
+/* particles */
 let canvas = document.getElementById("particles");
 let ctx = canvas.getContext("2d");
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
-let particles = [];
+let particles=[];
 for(let i=0;i<40;i++){
-particles.push({
-x: Math.random()*canvas.width,
-y: Math.random()*canvas.height,
-vx: (Math.random()-0.5)*0.4,
-vy: (Math.random()-0.5)*0.4
-});
+particles.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-0.5)*0.5,vy:(Math.random()-0.5)*0.5});
 }
 
 function draw(){
@@ -278,63 +207,40 @@ p.x+=p.vx;
 p.y+=p.vy;
 ctx.beginPath();
 ctx.arc(p.x,p.y,1.5,0,Math.PI*2);
-ctx.fillStyle="rgba(123,47,247,0.5)";
+ctx.fillStyle="purple";
 ctx.fill();
 });
 requestAnimationFrame(draw);
 }
 draw();
 
-/* AUDIO */
-let music = document.getElementById("music");
-let playBtn = document.getElementById("playBtn");
-let progress = document.getElementById("progress");
-let volume = document.getElementById("volume");
-let currentTime = document.getElementById("currentTime");
-let duration = document.getElementById("duration");
-
-playBtn.onclick=()=>{
-if(music.paused){
-music.play();
-playBtn.innerHTML="❚❚";
-}else{
-music.pause();
-playBtn.innerHTML="▶";
-}
-};
-
-music.addEventListener("loadedmetadata", ()=>{
-duration.innerText = formatTime(music.duration);
+/* tilt */
+document.querySelectorAll(".tilt").forEach(el=>{
+el.addEventListener("mousemove", e=>{
+let r=el.getBoundingClientRect();
+let x=e.clientX-r.left;
+let y=e.clientY-r.top;
+el.style.transform=`rotateX(${-(y/r.height-0.5)*20}deg) rotateY(${(x/r.width-0.5)*20}deg)`;
+});
+el.addEventListener("mouseleave",()=>el.style.transform="rotateX(0) rotateY(0)");
 });
 
-music.addEventListener("timeupdate", ()=>{
-progress.value = (music.currentTime/music.duration)*100;
-currentTime.innerText = formatTime(music.currentTime);
-});
-
-progress.oninput=()=>music.currentTime=(progress.value/100)*music.duration;
-volume.oninput=()=>music.volume=volume.value;
-
-function formatTime(sec){
-let m=Math.floor(sec/60);
-let s=Math.floor(sec%60);
-if(s<10)s="0"+s;
-return m+":"+s;
-}
-
-/* TYPING */
+/* typing */
 let words=["ay3ent...","streamer...","developer..."];
 let i=0,j=0;
-
 function type(){
-document.getElementById("typing").innerText=words[i].slice(0,j);
-j++;
-if(j>words[i].length){
-setTimeout(()=>{j=0;i=(i+1)%words.length},1000);
-}
+document.getElementById("typing").innerText=words[i].slice(0,j++);
+if(j>words[i].length){j=0;i=(i+1)%words.length;}
 setTimeout(type,180);
 }
 type();
+
+/* audio */
+let music=document.getElementById("music");
+document.getElementById("playBtn").onclick=()=>{
+music.paused?music.play():music.pause();
+};
+document.getElementById("volume").oninput=e=>music.volume=e.target.value;
 </script>
 
 </body>
