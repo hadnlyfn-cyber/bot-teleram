@@ -23,8 +23,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 999;
     cursor: pointer;
+    z-index: 999;
     transition: 1s;
 }
 
@@ -36,8 +36,8 @@ body {
 /* BG */
 .background {
     position: fixed;
-    width: 120%;
-    height: 120%;
+    width: 110%;
+    height: 110%;
     background: url('bg.gif') center/cover no-repeat;
     z-index: -2;
 }
@@ -57,19 +57,19 @@ body {
     height: 140px;
     border-radius: 50%;
     object-fit: cover;
-    box-shadow: 0 0 30px #7b2ff7;
+    box-shadow: 0 0 25px #7b2ff7;
 }
 
-/* STATUS */
-.status {
-    color: #00ff88;
-    font-size: 12px;
-}
-
-/* STATS */
-.stats {
+/* VIEWS */
+.views {
     color: #aaa;
     margin: 10px;
+}
+
+/* TEXT */
+.typing {
+    color: white;
+    margin-bottom: 20px;
 }
 
 /* BUTTONS */
@@ -79,24 +79,33 @@ body {
     gap: 15px;
 }
 
-.btn {
-    padding: 10px 20px;
-    border-radius: 25px;
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(123,47,247,0.3);
+.btn-row {
     display: flex;
     align-items: center;
     gap: 10px;
-    transition: 0.25s;
+}
+
+.btn {
+    padding: 10px;
+    border-radius: 18px;
+    backdrop-filter: blur(10px);
+    background: rgba(255,255,255,0.05);
+    transition: 0.2s;
 }
 
 .btn img {
     width: 55px;
+    border-radius: 12px;
 }
 
-.btn:hover {
-    transform: scale(1.05);
+.btn-text {
+    color: white;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.btn-row:hover .btn-text {
+    opacity: 1;
 }
 
 /* PLAYER */
@@ -106,25 +115,35 @@ body {
     left: 50%;
     transform: translateX(-50%);
     width: 320px;
-    padding: 10px;
+    padding: 15px;
     border-radius: 20px;
     background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(10px);
 }
 
 .play-btn {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
+    border: none;
+    background: white;
+    font-size: 18px;
+    cursor: pointer;
 }
 
-/* ANIM */
-.fade {
-    animation: fadeIn 1.5s ease forwards;
+.progress {
+    width: 100%;
+    margin-top: 10px;
 }
 
-@keyframes fadeIn {
-    from {opacity:0; transform: translateY(20px);}
-    to {opacity:1; transform: translateY(0);}
+.volume {
+    width: 80px;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 </style>
 </head>
@@ -139,30 +158,44 @@ body {
 
 <div class="background"></div>
 
-<div class="container fade">
+<div class="container">
 
 <img src="photo.jpg" class="avatar">
 
-<div class="status">● online</div>
+<div class="views" id="views">👁 0</div>
 
-<div class="stats" id="views">👁 0 | 👥 0</div>
+<div class="typing" id="typing"></div>
 
 <div class="buttons">
-<a href="https://twitch.tv/ay3ent" class="btn">
-<img src="twitch2.png"> twitch
-</a>
 
-<a href="https://t.me/ay3ent" class="btn">
-<img src="telegram.png"> telegram
+<div class="btn-row">
+<a href="https://twitch.tv/ay3ent" class="btn">
+<img src="twitch2.png">
 </a>
+<span class="btn-text">twitch</span>
+</div>
+
+<div class="btn-row">
+<a href="https://t.me/ay3ent" class="btn">
+<img src="telegram.png">
+</a>
+<span class="btn-text">telegram</span>
+</div>
+
 </div>
 
 </div>
 
 <!-- PLAYER -->
 <div class="player">
+
+<div class="controls">
 <button id="playBtn" class="play-btn">▶</button>
-<input type="range" id="volume" min="0" max="1" step="0.01" value="0.5">
+<input type="range" id="volume" class="volume" min="0" max="1" step="0.01" value="0.5">
+</div>
+
+<input type="range" id="progress" class="progress" value="0">
+
 </div>
 
 <audio id="music" src="music.mp3"></audio>
@@ -172,70 +205,48 @@ body {
 <!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, get, set, onValue, onDisconnect, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "AIza...",
+  apiKey: "AIzaSyB5YVBwTUnlCLzrZgxuoNhbkdEMDReOJKo",
   authDomain: "boty-b7a7f.firebaseapp.com",
   databaseURL: "https://boty-b7a7f-default-rtdb.firebaseio.com/",
   projectId: "boty-b7a7f",
   storageBucket: "boty-b7a7f.firebasestorage.app",
   messagingSenderId: "1011485229092",
-  appId: "1:1011485229092:web:..."
+  appId: "1:1011485229092:web:1d3e8c272845b36dcc18b1"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-/* VIEWS */
-const viewRef = ref(db, "views");
-get(viewRef).then(s=>{
-let c=s.exists()?s.val():0;
-set(viewRef,c+1);
+const viewsRef = ref(db, "views");
+
+get(viewsRef).then((snap)=>{
+let count = snap.exists()?snap.val():0;
+set(viewsRef, count + 1);
 });
 
-/* ONLINE USERS */
-const onlineRef = ref(db, "online");
-const user = push(onlineRef);
-
-set(user, true);
-onDisconnect(user).remove();
-
-onValue(onlineRef, s=>{
-let count = s.exists() ? Object.keys(s.val()).length : 0;
-document.getElementById("views").innerText =
-"👁 " + (s.val()?.views || 0) + " | 👥 " + count;
-});
-
-/* VIEW UPDATE */
-onValue(viewRef, s=>{
-let views = s.val() || 0;
-onValue(onlineRef, snap=>{
-let online = snap.exists() ? Object.keys(snap.val()).length : 0;
-document.getElementById("views").innerText =
-"👁 " + views + " | 👥 " + online;
-});
+onValue(viewsRef, (snap)=>{
+document.getElementById("views").innerText = "👁 " + snap.val();
 });
 </script>
 
 <script>
 let music = document.getElementById("music");
+let playBtn = document.getElementById("playBtn");
+let progress = document.getElementById("progress");
+let volume = document.getElementById("volume");
 
 /* ENTER */
 function enterSite(){
 document.querySelector(".intro").style.opacity="0";
 document.getElementById("main").style.opacity="1";
 setTimeout(()=>document.querySelector(".intro").remove(),1000);
-
-/* 🔥 запуск музыки */
-music.play().catch(()=>{});
 }
 
 /* PLAYER */
-let playBtn=document.getElementById("playBtn");
-let volume=document.getElementById("volume");
-
-playBtn.onclick=()=>{
+playBtn.onclick = ()=>{
 if(music.paused){
 music.play();
 playBtn.innerHTML="❚❚";
@@ -245,7 +256,31 @@ playBtn.innerHTML="▶";
 }
 };
 
-volume.oninput=e=>music.volume=e.target.value;
+music.addEventListener("timeupdate", ()=>{
+progress.value = (music.currentTime / music.duration)*100;
+});
+
+progress.oninput = ()=>{
+music.currentTime = (progress.value/100)*music.duration;
+};
+
+volume.oninput = ()=>{
+music.volume = volume.value;
+};
+
+/* TYPING */
+let words=["ay3ent...","streamer...","developer..."];
+let i=0,j=0;
+
+function type(){
+document.getElementById("typing").innerText = words[i].slice(0,j++);
+if(j>words[i].length){
+j=0;
+i=(i+1)%words.length;
+}
+setTimeout(type,150);
+}
+type();
 </script>
 
 </body>
