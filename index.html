@@ -26,7 +26,6 @@ z-index:9999;
 pointer-events:none;
 transform:translate(-50%,-50%);
 }
-
 .cursor-glow{
 position:fixed;
 width:40px;
@@ -83,102 +82,75 @@ transition:1.5s;
 }
 
 /* TEXT */
-.typing{
-color:white;
-margin-bottom:10px;
-height:20px;
-}
+.typing{color:white;margin-bottom:10px;height:20px;}
 
 /* AVATAR */
-.avatar-wrap{
-position:relative;
-width:150px;
-height:150px;
-}
-.avatar{
-width:100%;
-height:100%;
-border-radius:50%;
-z-index:2;
-}
-#circleVis{
-position:absolute;
-width:100%;
-height:100%;
-}
+.avatar-wrap{position:relative;width:150px;height:150px;}
+.avatar{width:100%;height:100%;border-radius:50%;}
+#circleVis{position:absolute;width:100%;height:100%;}
 
 /* BUTTONS */
-.buttons{
-margin-top:20px;
-display:flex;
-flex-direction:column;
-gap:15px;
-}
-.btn-row{
-display:flex;
-align-items:center;
-gap:10px;
-}
-.btn{
-padding:10px;
-border-radius:16px;
-background:rgba(255,255,255,0.06);
-transition:0.25s;
-}
+.buttons{margin-top:20px;display:flex;flex-direction:column;gap:15px;}
+.btn-row{display:flex;align-items:center;gap:10px;}
+.btn{padding:10px;border-radius:16px;background:rgba(255,255,255,0.06);transition:0.25s;}
 .btn img{width:50px;border-radius:10px;}
-.btn-text{
-color:white;
-opacity:0;
-transform:translateX(-10px);
-transition:0.3s;
-}
-.btn-row:hover .btn-text{
-opacity:1;
-transform:translateX(0);
-}
-.btn:hover{
-transform:scale(1.08);
-box-shadow:0 0 20px #7b2ff7;
-}
+.btn-text{color:white;opacity:0;transform:translateX(-10px);transition:0.3s;}
+.btn-row:hover .btn-text{opacity:1;transform:translateX(0);}
+.btn:hover{transform:scale(1.08);box-shadow:0 0 20px #7b2ff7;}
 
-/* PLAYER */
+/* PLAYER (SPOTIFY STYLE) */
 .player{
 position:absolute;
 bottom:80px;
 width:80%;
 }
 
+.player-top{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:15px;
+}
+
 .play-btn{
-width:60px;
-height:60px;
+width:55px;
+height:55px;
 border-radius:50%;
 background:#7b2ff7;
 border:none;
 color:white;
 cursor:pointer;
-display:block;
-margin:auto;
-box-shadow:0 0 20px #7b2ff7;
+box-shadow:0 0 15px #7b2ff7;
 }
 
-/* VOLUME */
-.volume{
-width:100%;
-margin-top:10px;
+.volume-wrap{
+display:flex;
+align-items:center;
+gap:8px;
 }
-.volume input{
-width:100%;
-appearance:none;
+
+.volume-icon{
+color:white;
+cursor:pointer;
+font-size:14px;
+opacity:0.8;
+}
+
+.volume-slider{
+width:70px;
 height:4px;
-background:rgba(255,255,255,0.2);
-outline:none;
-}
-.volume input::-webkit-slider-thumb{
 appearance:none;
-width:12px;
-height:12px;
+background:rgba(255,255,255,0.2);
+border-radius:10px;
+}
+
+.volume-slider::-webkit-slider-thumb{
+appearance:none;
+width:10px;
+height:10px;
 background:#7b2ff7;
 border-radius:50%;
+box-shadow:0 0 8px #7b2ff7;
 cursor:pointer;
 }
 
@@ -251,7 +223,17 @@ height:60px;
 </div>
 
 <div class="player">
+
+<div class="player-top">
+
 <button id="playBtn" class="play-btn">▶</button>
+
+<div class="volume-wrap">
+<span id="volumeIcon" class="volume-icon">🔊</span>
+<input type="range" id="volume" class="volume-slider" min="0" max="1" step="0.01">
+</div>
+
+</div>
 
 <div class="progress-container" id="progressContainer">
 <div id="progressBar"></div>
@@ -260,10 +242,6 @@ height:60px;
 <div class="time">
 <span id="current">0:00</span>
 <span id="duration">0:00</span>
-</div>
-
-<div class="volume">
-<input type="range" id="volume" min="0" max="1" step="0.01">
 </div>
 
 </div>
@@ -279,17 +257,15 @@ const music = document.getElementById("music");
 const playBtn = document.getElementById("playBtn");
 
 /* CURSOR */
-const cur = document.getElementById("cursor");
-const glow = document.getElementById("cursorGlow");
+const cur=document.getElementById("cursor");
+const glow=document.getElementById("cursorGlow");
 
 let x=0,y=0,fx=0,fy=0;
-
 document.onmousemove=e=>{
 x=e.clientX;y=e.clientY;
 cur.style.left=x+"px";
 cur.style.top=y+"px";
 };
-
 (function loop(){
 fx+=(x-fx)*0.15;
 fy+=(y-fy)*0.15;
@@ -315,20 +291,37 @@ const src=audioCtx.createMediaElementSource(music);
 src.connect(analyser);
 analyser.connect(audioCtx.destination);
 analyser.fftSize=128;
-
 const data=new Uint8Array(analyser.frequencyBinCount);
 
 /* VOLUME */
-const volume = document.getElementById("volume");
-volume.value = localStorage.getItem("vol") || 0.5;
-music.volume = volume.value;
+const volume=document.getElementById("volume");
+const volumeIcon=document.getElementById("volumeIcon");
 
-volume.oninput = ()=>{
-music.volume = volume.value;
-localStorage.setItem("vol", volume.value);
+volume.value=localStorage.getItem("vol")||0.5;
+music.volume=volume.value;
+
+volume.oninput=()=>{
+music.volume=volume.value;
+localStorage.setItem("vol",volume.value);
+updateIcon();
 };
 
-/* VISUALIZER */
+volumeIcon.onclick=()=>{
+if(music.volume>0){
+music.volume=0;
+volume.value=0;
+}else{
+music.volume=0.5;
+volume.value=0.5;
+}
+updateIcon();
+};
+
+function updateIcon(){
+volumeIcon.textContent = music.volume==0 ? "🔇" : "🔊";
+}
+
+/* VIS */
 const c1=document.getElementById("audioVis");
 const ctx1=c1.getContext("2d");
 const c2=document.getElementById("circleVis");
@@ -347,6 +340,7 @@ function draw(){
 requestAnimationFrame(draw);
 analyser.getByteFrequencyData(data);
 
+/* bars */
 ctx1.clearRect(0,0,c1.width,c1.height);
 let w=c1.width/data.length;
 for(let i=0;i<data.length;i++){
@@ -355,6 +349,7 @@ ctx1.fillStyle="#7b2ff7";
 ctx1.fillRect(i*w,c1.height-h,w-2,h);
 }
 
+/* circle */
 ctx2.clearRect(0,0,c2.width,c2.height);
 let cx=c2.width/2;
 let cy=c2.height/2;
