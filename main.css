@@ -33,18 +33,56 @@
     opacity: 0;
     transition: opacity 1.5s ease;
 }
-.intro {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-    cursor: pointer;
-    opacity: 1;
-    transition: opacity 1.2s ease;
+/* INTRO (NEW STYLE) */
+.intro{
+position:fixed;
+width:100%;
+height:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+cursor:pointer;
+z-index:999;
+transition:opacity 0.6s ease;
+}
+
+/* размытый фон интро */
+.intro::before{
+content:"";
+position:absolute;
+width:100%;
+height:100%;
+background:url('bg.gif') center/cover no-repeat;
+filter:blur(20px) brightness(0.4);
+z-index:-1;
+}
+
+/* текст */
+.enter-text{
+color:white;
+font-size:28px;
+letter-spacing:3px;
+text-transform:uppercase;
+text-shadow:
+0 0 4px rgba(255,255,255,0.8),
+0 0 10px rgba(255,255,255,0.5);
+animation: enterPulse 1.8s ease-in-out infinite;
+transition:0.3s;
+}
+
+/* hover эффект */
+.intro:hover .enter-text{
+transform:scale(1.08);
+text-shadow:
+0 0 6px rgba(255,255,255,1),
+0 0 20px rgba(255,255,255,0.7);
+}
+
+/* пульсация */
+@keyframes enterPulse{
+0%{opacity:0.7;}
+50%{opacity:1;}
+100%{opacity:0.7;}
 }
 body {
     background: black;
