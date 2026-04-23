@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -10,7 +11,7 @@
 body{
 margin:0;
 overflow:hidden;
-background:#121212; /* темный фон */
+background:#121212;
 font-family:"Bungee",sans-serif;
 cursor:none;
 }
@@ -31,7 +32,7 @@ position:fixed;
 width:40px;
 height:40px;
 border-radius:50%;
-background:rgba(123,47,247,0.1); /* более тусклый свет */
+background:rgba(123,47,247,0.12);
 filter:blur(12px);
 z-index:9998;
 pointer-events:none;
@@ -43,13 +44,36 @@ transform:translate(-50%,-50%);
 position:fixed;
 width:100%;
 height:100%;
-background:#121212; /* темный фон */
 display:flex;
 justify-content:center;
 align-items:center;
 cursor:pointer;
 z-index:999;
-transition:opacity 1s;
+transition:opacity 0.6s ease;
+}
+.intro::before{
+content:"";
+position:absolute;
+width:100%;
+height:100%;
+background:url('bg.gif') center/cover no-repeat;
+filter:blur(20px) brightness(0.4);
+z-index:-1;
+}
+.enter-text{
+color:white;
+font-size:26px;
+letter-spacing:3px;
+text-transform:uppercase;
+text-shadow:
+0 0 4px rgba(255,255,255,0.8),
+0 0 10px rgba(255,255,255,0.5);
+animation:pulse 1.8s infinite;
+}
+@keyframes pulse{
+0%{opacity:0.7;}
+50%{opacity:1;}
+100%{opacity:0.7;}
 }
 
 /* BG */
@@ -59,7 +83,7 @@ width:100%;
 height:100%;
 background:url('bg.gif') center/cover no-repeat;
 z-index:-2;
-filter:brightness(0.5); /* затемняем фон */
+filter:brightness(0.5);
 }
 
 /* WRAPPER */
@@ -71,119 +95,69 @@ transform:translate(-50%,-50%);
 width:80vw;
 height:80vh;
 border-radius:30px;
-background:rgba(20,20,20,0.7); /* более темный фоновый контейнер */
+background:rgba(20,20,20,0.7);
 backdrop-filter:blur(25px);
-box-shadow:0 0 60px rgba(123,47,247,0.25); /* уменьшенный эффект */
+box-shadow:0 0 40px rgba(0,0,0,0.6);
 display:flex;
 flex-direction:column;
 align-items:center;
 justify-content:center;
 opacity:0;
-transition:1s ease-out;
-}
-
-/* TYPING (NEON EFFECT) */
-.typing{
-color:white;
-font-size:20px;
-font-weight:900;
-text-align:center;
-margin-top:10px;
-text-shadow: 0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px #ffffff, 0 0 2px black;
-animation: neonText 1.5s ease-in-out infinite alternate, pulseText 2s ease-in-out infinite;
-}
-
-@keyframes neonText {
-    0% { text-shadow: 0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px #ffffff, 0 0 2px black; }
-    50% { text-shadow: 0 0 8px #ffffff, 0 0 16px #ffffff, 0 0 30px #ffffff, 0 0 60px #ffffff, 0 0 2px black; }
-    100% { text-shadow: 0 0 4px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px #ffffff, 0 0 2px black; }
-}
-
-@keyframes pulseText {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+transition:0.6s;
 }
 
 /* AVATAR */
-.avatar-wrap{
-position:relative;
-width:150px;
-height:150px;
-transform: translateY(0);
+.avatar{
+width:140px;
+height:140px;
+border-radius:50%;
 }
 
-.avatar{width:100%;height:100%;border-radius:50%;}
+/* TEXT */
+.typing{
+margin-top:10px;
+font-size:20px;
+color:white;
+text-shadow:0 0 2px black;
+}
 
 /* BUTTONS */
 .buttons{
-margin-top:30px;
+margin-top:20px;
 display:flex;
 flex-direction:column;
 gap:15px;
-transform: translateY(100px); /* выдвигаем кнопки вниз */
-transition: transform 0.5s ease-out;
 }
-.btn-row{display:flex;align-items:center;gap:10px;}
-.btn{padding:10px;border-radius:16px;background:rgba(255,255,255,0.06);transition:0.25s;}
-.btn img{width:50px;border-radius:10px;}
-.btn-text{color:white;opacity:0;transform:translateX(-10px);transition:0.3s;}
-.btn-row:hover .btn-text{opacity:1;transform:translateX(0);}
-.btn:hover{transform:scale(1.08);box-shadow:0 0 20px #7b2ff7;}
+.btn{
+display:flex;
+align-items:center;
+gap:10px;
+padding:10px;
+border-radius:14px;
+background:rgba(255,255,255,0.05);
+transition:0.25s;
+text-decoration:none;
+}
+.btn img{width:40px;}
+.btn span{color:white;opacity:0.7;}
+.btn:hover{
+transform:scale(1.05);
+opacity:1;
+}
 
-/* PLAYER (SPOTIFY STYLE) */
+/* PLAYER */
 .player{
 position:absolute;
-bottom:60px;
-width:80%;
+bottom:50px;
+width:70%;
 }
-
-.player-top{
-display:flex;
-align-items:center;
-justify-content:center;
-gap:15px;
-}
-
 .play-btn{
-width:55px;
-height:55px;
+width:50px;
+height:50px;
 border-radius:50%;
-background:#7b2ff7;
 border:none;
-color:white;
-cursor:pointer;
-box-shadow:0 0 15px #7b2ff7;
-}
-
-.volume-wrap{
-display:flex;
-align-items:center;
-gap:8px;
-}
-
-.volume-icon{
-color:white;
-cursor:pointer;
-font-size:14px;
-opacity:0.8;
-}
-
-.volume-slider{
-width:70px;
-height:4px;
-appearance:none;
-background:rgba(255,255,255,0.2);
-border-radius:10px;
-}
-
-.volume-slider::-webkit-slider-thumb{
-appearance:none;
-width:10px;
-height:10px;
 background:#7b2ff7;
-border-radius:50%;
-box-shadow:0 0 8px #7b2ff7;
+color:white;
 cursor:pointer;
 }
 
@@ -191,7 +165,7 @@ cursor:pointer;
 .progress-container{
 width:100%;
 height:4px;
-background:rgba(255,255,255,0.2);
+background:#333;
 margin-top:10px;
 cursor:pointer;
 }
@@ -208,14 +182,6 @@ justify-content:space-between;
 font-size:11px;
 color:#aaa;
 }
-
-/* VIS (bars only now) */
-#audioVis{
-position:absolute;
-bottom:0;
-width:100%;
-height:60px;
-}
 </style>
 </head>
 
@@ -225,47 +191,28 @@ height:60px;
 <div class="cursor-glow" id="cursorGlow"></div>
 
 <div class="intro" id="intro">
-<h1 style="color:white;">AY3ENT BIO</h1>
+<div class="enter-text">click to enter</div>
 </div>
 
 <div class="background"></div>
 
 <div class="wrapper" id="main">
 
-<div class="avatar-wrap">
 <img src="photo.jpg" class="avatar">
-</div>
 
-<div id="typing" class="typing">AY3ENT</div>
+<div class="typing">AY3ENT</div>
 
 <div class="buttons">
-<div class="btn-row">
 <a href="https://twitch.tv/ay3ent" target="_blank" class="btn">
-<img src="twitch2.png">
+<img src="twitch2.png"><span>twitch</span>
 </a>
-<span class="btn-text">twitch</span>
-</div>
-
-<div class="btn-row">
 <a href="https://t.me/ay3ent" target="_blank" class="btn">
-<img src="telegram.png">
+<img src="telegram.png"><span>telegram</span>
 </a>
-<span class="btn-text">telegram</span>
-</div>
 </div>
 
 <div class="player">
-
-<div class="player-top">
-
 <button id="playBtn" class="play-btn">▶</button>
-
-<div class="volume-wrap">
-<span id="volumeIcon" class="volume-icon">🔊</span>
-<input type="range" id="volume" class="volume-slider" min="0" max="1" step="0.01">
-</div>
-
-</div>
 
 <div class="progress-container" id="progressContainer">
 <div id="progressBar"></div>
@@ -275,105 +222,38 @@ height:60px;
 <span id="current">0:00</span>
 <span id="duration">0:00</span>
 </div>
-
 </div>
-
-<canvas id="audioVis"></canvas>
 
 </div>
 
 <audio id="music" src="music.mp3"></audio>
 
 <script>
-const music = document.getElementById("music");
-const playBtn = document.getElementById("playBtn");
+const music=document.getElementById("music");
+const playBtn=document.getElementById("playBtn");
 
 /* CURSOR */
-const cur=document.getElementById("cursor");
-const glow=document.getElementById("cursorGlow");
+const c=document.getElementById("cursor");
+const g=document.getElementById("cursorGlow");
 
 let x=0,y=0,fx=0,fy=0;
 document.onmousemove=e=>{
 x=e.clientX;y=e.clientY;
-cur.style.left=x+"px";
-cur.style.top=y+"px";
+c.style.left=x+"px";
+c.style.top=y+"px";
 };
 (function loop(){
 fx+=(x-fx)*0.15;
 fy+=(y-fy)*0.15;
-glow.style.left=fx+"px";
-glow.style.top=fy+"px";
+g.style.left=fx+"px";
+g.style.top=fy+"px";
 requestAnimationFrame(loop);
 })();
 
 /* AUDIO */
-const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-const analyser=audioCtx.createAnalyser();
-const src=audioCtx.createMediaElementSource(music);
-src.connect(analyser);
-analyser.connect(audioCtx.destination);
-analyser.fftSize=128;
-const data=new Uint8Array(analyser.frequencyBinCount);
-
-/* VOLUME */
-const volume=document.getElementById("volume");
-const volumeIcon=document.getElementById("volumeIcon");
-
-volume.value=localStorage.getItem("vol")||0.5;
-music.volume=volume.value;
-
-volume.oninput=()=>{
-music.volume=volume.value;
-localStorage.setItem("vol",volume.value);
-updateIcon();
-};
-
-volumeIcon.onclick=()=>{
-if(music.volume>0){
-music.volume=0;
-volume.value=0;
-}else{
-music.volume=0.5;
-volume.value=0.5;
-}
-updateIcon();
-};
-
-function updateIcon(){
-volumeIcon.textContent = music.volume==0 ? "🔇" : "🔊";
-}
-
-/* VIS */
-const c1=document.getElementById("audioVis");
-const ctx1=c1.getContext("2d");
-
-function resize(){
-c1.width=window.innerWidth;
-c1.height=60;
-}
-resize();
-window.onresize=resize;
-
-function draw(){
-requestAnimationFrame(draw);
-analyser.getByteFrequencyData(data);
-
-/* bars */
-ctx1.clearRect(0,0,c1.width,c1.height);
-let w=c1.width/data.length;
-for(let i=0;i<data.length;i++){
-let h=data[i]/2;
-ctx1.fillStyle="#7b2ff7";
-ctx1.fillRect(i*w,c1.height-h,w-2,h);
-}
-}
-
-/* PLAY */
-playBtn.onclick=()=>{ 
+playBtn.onclick=()=>{
 if(music.paused){
 music.play();
-audioCtx.resume();
-draw();
 playBtn.innerHTML="❚❚";
 }else{
 music.pause();
@@ -389,19 +269,17 @@ progressBar.style.width=p+"%";
 current.innerText=format(music.currentTime);
 };
 
+/* SEEK */
+progressContainer.onclick=e=>{
+music.currentTime=(e.offsetX/e.target.clientWidth)*music.duration;
+};
+
 /* ENTER */
 intro.onclick=()=>{
 intro.style.opacity=0;
 main.style.opacity=1;
-document.querySelectorAll('.avatar-wrap,.buttons').forEach(el => {
-el.style.transform = "translateY(0)";
-});
-
-setTimeout(()=>intro.remove(),0);
-
+setTimeout(()=>intro.remove(),600);
 music.play();
-audioCtx.resume();
-draw();
 playBtn.innerHTML="❚❚";
 };
 
@@ -414,3 +292,4 @@ return m+":"+(sec<10?"0":"")+sec;
 
 </body>
 </html>
+```
